@@ -24,16 +24,35 @@
 import { ref, onMounted } from 'vue'
 import SocialLinks from './SocialLinks.vue'
 import { getMenuData } from '../services/menuService'
+import { getDescriptionHead } from '../services/apiService'
 
 const menuItems = ref([])
-const socialNetworks = ref([
-  { icon: 'bi-facebook', title: 'Facebook', href: 'https://facebook.com' },
-  { icon: 'bi-twitter', title: 'Twitter', href: 'https://twitter.com' },
-  { icon: 'bi-linkedin', title: 'LinkedIn', href: 'https://linkedin.com' }
-])
+const socialNetworks = ref([])
+
+function normalizeSocialNetworks(networks) {
+  return (networks || []).map((network) => ({
+    icon: getIconForNetwork(network.title),
+    title: network.title || 'Social link',
+    href: network.url || '#'
+  }))
+}
+
+function getIconForNetwork(title) {
+  const normalized = (title || '').toLowerCase()
+  if (normalized.includes('youtube')) return 'bi-youtube'
+  if (normalized.includes('discord')) return 'bi-discord'
+  return 'bi-facebook'
+}
 
 onMounted(() => {
   menuItems.value = getMenuData('en')
+  getDescriptionHead()
+    .then((data) => {
+      socialNetworks.value = normalizeSocialNetworks(data.socialnetworks)
+    })
+    .catch(() => {
+      socialNetworks.value = []
+    })
 })
 </script>
 

@@ -27,6 +27,14 @@
         <div class="card-body">
           <div class="position-relative">
             <img :src="mapAssetUrl" alt="Regional map" class="img-fluid rounded border" />
+            <div
+              v-for="poi in poiMarkers"
+              :key="poi.id"
+              class="poi-marker"
+              :style="{ left: `${poi.x}px`, top: `${poi.y}px` }"
+              :title="poi.name"
+              aria-hidden="true"
+            />
             <a
               v-for="marker in markers"
               :key="marker.id"
@@ -62,6 +70,10 @@ const clubs = ref([])
 const loading = ref(true)
 const error = ref(null)
 const markers = ref([])
+const poiMarkers = ref([
+  { id: 'firstpoi', name: 'Roscoff', x: 330, y: 110 },
+  { id: 'lastpoi', name: 'Penestin', x: 728, y: 600 }
+])
 
 const mapAssetUrl = computed(() => `${env.assetBaseUrl}/map.svg`)
 
@@ -70,8 +82,8 @@ function getMapsUrl(coordinates) {
 }
 
 function mapClubs(clubList) {
-  const firstPoi = buildCoordinateModel('48.394157, -4.486726', '300, 300')
-  const lastPoi = buildCoordinateModel('48.111990, -1.678607', '1300, 400')
+  const firstPoi = buildCoordinateModel('48.394157, -4.486726', '330, 110')
+  const lastPoi = buildCoordinateModel('48.111990, -1.678607', '728, 600')
   const vector = buildCoordinateModel(getVector(firstPoi.gps, lastPoi.gps), getVector(firstPoi.map, lastPoi.map))
 
   return clubList
@@ -122,5 +134,16 @@ onMounted(() => {
   font-size: 1.2rem;
   line-height: 1;
   text-shadow: 0 0 3px white;
+}
+
+.poi-marker {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #2563eb;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 </style>

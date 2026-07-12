@@ -11,10 +11,12 @@ import GoogleCalendar from '../pages/GoogleCalendar.vue'
 import ItemsPage from '../pages/ItemsPage.vue'
 import ItemDetails from '../pages/ItemDetails.vue'
 import NotFound from '../pages/NotFound.vue'
+import About from '../pages/About.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/news', name: 'News', component: NewsPreview },
+  { path: '/about', name: 'About', component: About },
   { path: '/news/:id', name: 'NewsDetails', component: NewsDetails, props: true },
   { path: '/actualites', name: 'Actualites', component: NewsPreview },
   { path: '/actualites/:id', name: 'ActualitesDetails', component: NewsDetails, props: true },

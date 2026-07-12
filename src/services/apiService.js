@@ -18,3 +18,8 @@ export function getContentById(type, id) {
   return fetch(`${contentApi}/${type}/${encodeURIComponent(id)}`)
     .then(handleResponse)
 }
+
+export function getDescriptionHead() {
+  return fetch(`${contentApi}/description/head`)
+    .then(handleResponse)
+}
