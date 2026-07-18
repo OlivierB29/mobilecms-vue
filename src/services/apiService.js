@@ -1,4 +1,4 @@
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/mobilecmsapi/v43'
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/mobilecmsapi/v50'
 const contentApi = `${apiBaseUrl}/webapi/content`
 
 async function handleResponse(response) {
