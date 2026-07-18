@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { getContentList } from '../services/apiService'
 
 const props = defineProps({
@@ -95,7 +95,11 @@ function getQuickLinks(item) {
   return links
 }
 
-onMounted(() => {
+function loadItems() {
+  loading.value = true
+  error.value = null
+  items.value = []
+
   getContentList(props.type)
     .then((data) => {
       items.value = data || []
@@ -106,5 +110,8 @@ onMounted(() => {
     .finally(() => {
       loading.value = false
     })
-})
+}
+
+onMounted(loadItems)
+watch(() => props.type, loadItems)
 </script>

@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { getContentById } from '../services/apiService'
 import { initItemMedia, getImages, getAttachments } from '../services/mediaService'
 
@@ -79,7 +79,9 @@ const title = computed(() => `${typeLabel.value} details`)
 const images = computed(() => getImages(item.value))
 const attachments = computed(() => getAttachments(item.value))
 
-onMounted(() => {
+const fetchContent = () => {
+  loading.value = true
+  error.value = null
   getContentById(props.type, props.id)
     .then((data) => {
       item.value = initItemMedia(props.type, props.id, data)
@@ -90,5 +92,21 @@ onMounted(() => {
     .finally(() => {
       loading.value = false
     })
+}
+
+console.log('!!!!!!!!!!!!!!!!!!! ItemDetails props:')
+if (props) {
+  console.log('type:', props.type)
+  console.log('id:', props.id)
+} else {
+  console.log('props is undefined')
+}
+
+onMounted(() => {
+  fetchContent()
+})
+
+watch(() => [props.type, props.id], () => {
+  fetchContent()
 })
 </script>
