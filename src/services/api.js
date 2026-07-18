@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8888/mobilecmsapi/v43/webapi/content'
+const API_BASE = `${(import.meta.env.VITE_API_BASE_URL || '/mobilecmsapi/v50').replace(/\/$/, '')}/webapi/content`
 
 export async function fetchContentList(type) {
   const response = await fetch(`${API_BASE}/${type}`)
