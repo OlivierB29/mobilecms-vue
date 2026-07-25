@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container-fluid">
-      <router-link class="navbar-brand" to="/">mobilecms</router-link>
+      <router-link class="navbar-brand" to="/"> {{ description.title }}</router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -28,6 +28,7 @@ import { getDescriptionHead } from '../services/apiService'
 
 const menuItems = ref([])
 const socialNetworks = ref([])
+const description = ref([])
 
 function normalizeSocialNetworks(networks) {
   return (networks || []).map((network) => ({
@@ -48,7 +49,9 @@ onMounted(() => {
   menuItems.value = getMenuData('en')
   getDescriptionHead()
     .then((data) => {
+      description.value = data || {}
       socialNetworks.value = normalizeSocialNetworks(data.socialnetworks)
+
     })
     .catch(() => {
       socialNetworks.value = []

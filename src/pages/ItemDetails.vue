@@ -94,7 +94,7 @@ const fetchContent = () => {
     })
 }
 
-console.log('!!!!!!!!!!!!!!!!!!! ItemDetails props:')
+
 if (props) {
   console.log('type:', props.type)
   console.log('id:', props.id)

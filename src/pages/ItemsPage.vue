@@ -102,7 +102,7 @@ function loadItems() {
 
   getContentList(props.type)
     .then((data) => {
-      items.value = data || []
+      items.value = data.reverse() || []
     })
     .catch((err) => {
       error.value = err.message || `Failed to load ${props.type}.`

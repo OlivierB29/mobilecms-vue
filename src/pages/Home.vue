@@ -73,8 +73,10 @@ function getNewsDate(item) {
 
 function sortLatestNews(items) {
   return [...items].sort((a, b) => {
+
     const aDate = Date.parse(getNewsDate(a))
     const bDate = Date.parse(getNewsDate(b))
+
 
     if (!Number.isNaN(aDate) && !Number.isNaN(bDate)) {
       return bDate - aDate
@@ -90,10 +92,11 @@ function sortLatestNews(items) {
 function getText(item) {
   const text = item.description || item.details || item.body || item.summary || ''
   const plainText = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-  return plainText.length > 220 ? `${plainText.slice(0, 217)}...` : plainText
+  return plainText
 }
 
 function normalizeNews(items) {
+
   return sortLatestNews((items || []).map((item) => {
     const itemId = item.id || item.slug || item.name || ''
     const initialized = initItemMedia('news', itemId, item)
@@ -116,6 +119,7 @@ onMounted(() => {
 
   getContentList('news')
     .then((data) => {
+        console.log('getContentList news', data)
       latestNews.value = normalizeNews(data)
     })
     .catch((err) => {

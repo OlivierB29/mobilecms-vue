@@ -32,9 +32,12 @@ onMounted(() => {
   getDescriptionHead()
     .then((data) => {
       metadata.value = data || {}
+
     })
     .catch(() => {
       metadata.value = {}
     })
+
+
 })
 </script>

@@ -7,9 +7,7 @@
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
 
     <div v-else>
-      <div class="mb-4">
-        <ViewRegionalMap />
-      </div>
+
       <div class="row g-4">
         <div v-for="club in clubs" :key="club.id" class="col-md-6">
           <div class="card shadow-sm h-100">

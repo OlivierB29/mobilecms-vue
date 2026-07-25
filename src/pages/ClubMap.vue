@@ -23,31 +23,6 @@
         </div>
       </div>
 
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <div class="position-relative">
-            <img :src="mapAssetUrl" alt="Regional map" class="img-fluid rounded border" />
-            <div
-              v-for="poi in poiMarkers"
-              :key="poi.id"
-              class="poi-marker"
-              :style="{ left: `${poi.x}px`, top: `${poi.y}px` }"
-              :title="poi.name"
-              aria-hidden="true"
-            />
-            <a
-              v-for="marker in markers"
-              :key="marker.id"
-              :href="`/club/${encodeURIComponent(marker.id)}`"
-              class="marker-link"
-              :style="{ left: `${marker.x}px`, top: `${marker.y}px` }"
-              :title="marker.title"
-            >
-              <span class="marker-badge">●</span>
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
