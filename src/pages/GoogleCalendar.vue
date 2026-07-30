@@ -51,8 +51,21 @@ onMounted(() => {
     .then(([calendarData, descriptionHead]) => {
       const url = descriptionHead?.googlecalendar?.embedurl || ''
       embedUrl.value = url
+
+      // compute bounds: 2 months in the past, 1 year in the future
+      const now = new Date()
+      const pastBound = new Date(now)
+      pastBound.setMonth(pastBound.getMonth() - 2)
+      const futureBound = new Date(now)
+      futureBound.setFullYear(futureBound.getFullYear() + 1)
+
       events.value = (calendarData || [])
         .slice()
+        .filter((item) => {
+          const ts = parseEventDate(item)
+          if (!ts) return false
+          return ts >= pastBound.getTime() && ts <= futureBound.getTime()
+        })
         .sort((a, b) => parseEventDate(b) - parseEventDate(a))
     })
     .catch((err) => {
