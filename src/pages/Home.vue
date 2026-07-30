@@ -51,7 +51,7 @@ const bannerUrl = '/assets/banner-1900.jpg'
 const cards = [
   { title: 'News', description: 'Browse the latest news content.', link: '/news' },
   { title: 'Clubs', description: 'Explore club activities and details.', link: '/clubs' },
-  { title: 'Calendar', description: 'View the calendar and event details.', link: '/googlecalendar' }
+  { title: 'Calendar', description: 'View the calendar and event details.', link: '/calendar' }
 ]
 
 const latestNews = ref([])

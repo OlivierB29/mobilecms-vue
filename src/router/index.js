@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+
 import Home from '../pages/Home.vue'
 import NewsPreview from '../pages/NewsPreview.vue'
 import NewsDetails from '../pages/NewsDetails.vue'
@@ -7,14 +8,16 @@ import ClubDetail from '../pages/ClubDetail.vue'
 import ClubMap from '../pages/ClubMap.vue'
 import CalendarActivities from '../pages/CalendarActivities.vue'
 import CalendarEvent from '../pages/CalendarEvent.vue'
-import GoogleCalendar from '../pages/GoogleCalendar.vue'
+import CalendarPage from '../pages/CalendarPage.vue'
 import ItemsPage from '../pages/ItemsPage.vue'
 import ItemDetails from '../pages/ItemDetails.vue'
 import NotFound from '../pages/NotFound.vue'
 import About from '../pages/About.vue'
 
+
+
 const routes = [
-  { path: '/', name: 'Home', component: Home },
+  { path: '/', name: 'Accueil', component: Home },
   { path: '/news', name: 'News', component: NewsPreview },
   { path: '/about', name: 'About', component: About },
   { path: '/news/:id', name: 'NewsDetails', component: NewsDetails, props: true },
@@ -28,10 +31,10 @@ const routes = [
   { path: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true },
   { path: '/clubs/:activity', name: 'ClubsActivity', component: ClubActivities, props: true },
 
-  { path: '/calendar', name: 'Calendar', component: GoogleCalendar },
-  { path: '/calendrier', name: 'Calendrier', component: GoogleCalendar },
-  { path: '/googlecalendar', name: 'GoogleCalendar', component: GoogleCalendar },
-  { path: '/calendriergoogle', name: 'CalendrierGoogle', component: GoogleCalendar },
+  { path: '/calendar', name: 'Calendar', component: CalendarPage },
+  { path: '/calendrier', name: 'Calendrier', component: CalendarPage },
+  { path: '/calendar', name: 'CalendarPage', component: CalendarPage },
+  { path: '/calendrier', name: 'CalendrierGoogle', component: CalendarPage },
   { path: '/calendar/:activity', name: 'CalendarActivities', component: CalendarActivities, props: true },
   { path: '/calendrier/:activity', name: 'CalendrierActivities', component: CalendarActivities, props: true },
   { path: '/calendar/detail/:id', name: 'CalendarEvent', component: CalendarEvent, props: true },
@@ -60,6 +63,17 @@ const routes = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+const getPageTitle = (route) => {
+  const title = typeof route.meta?.title === 'function'
+    ? route.meta.title()
+    : route.meta?.title || route.name || route.path
+  return title ? String(title) : ''
+}
+
+router.afterEach((to) => {
+  document.title = getPageTitle(to)
 })
 
 export default router
