@@ -1,8 +1,7 @@
 <template>
   <div class="container py-4">
     <h2>{{ title }}</h2>
-    <p class="text-muted">Content fetched from the MobileCMS API for {{ type }}.</p>
-
+    
     <div v-if="loading" class="alert alert-info">Loading {{ type }}...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
 
@@ -33,7 +32,7 @@
                 :to="getDetailRoute(item.id)"
                 class="btn btn-outline-primary btn-sm"
               >
-                Open details
+                Ouvrir
               </router-link>
             </div>
           </div>
@@ -102,7 +101,7 @@ function loadItems() {
 
   getContentList(props.type)
     .then((data) => {
-      items.value = data.reverse() || []
+      items.value = data || []
     })
     .catch((err) => {
       error.value = err.message || `Failed to load ${props.type}.`

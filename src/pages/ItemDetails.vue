@@ -1,7 +1,6 @@
 <template>
   <div class="container py-4">
     <h2>{{ title }}</h2>
-    <p class="text-muted">Detail page for {{ typeLabel }} item {{ id }}.</p>
 
     <div v-if="loading" class="alert alert-info">Loading details...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>

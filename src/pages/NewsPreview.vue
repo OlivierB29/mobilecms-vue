@@ -1,8 +1,5 @@
 <template>
   <div class="container py-4">
-    <h2>News</h2>
-    <p class="text-muted">Preview of current news items.</p>
-
     <div v-if="loading" class="alert alert-info">Loading news...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
 
