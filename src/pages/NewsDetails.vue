@@ -5,7 +5,7 @@
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-else-if="news" class="card shadow-sm">
       <div class="card-body">
-        <h3 class="card-title">{{ news.title || news.name || `News Item ${id}` }}</h3>
+        <h3 class="card-title">{{news.title}}</h3>
         <div class="card-text" v-html="news.description"></div>
         
         <pre v-if="news && !news.content && !news.description && !news.body" class="mt-3">{{ news }}</pre>
@@ -15,12 +15,9 @@
     <div v-if="images.length" class="mt-4">
       <h4>Images</h4>
       <div class="row g-3">
-        <div v-for="image in images" :key="image.url" class="col-12 col-md-4">
+        <div v-for="image in images" :key="image.url" class="col col-md">
           <div class="card">
-            <img :src="image.url" class="card-img-top" :alt="image.title || image.name || 'image'" />
-            <div class="card-body p-2">
-              <div class="small text-muted">{{ image.title || image.name || image.url }}</div>
-            </div>
+            <img :src="image.url" class="card-img-top" :alt="image.title || image.name || 'image'" :title="image.title || image.name || image.url"/>
           </div>
         </div>
       </div>

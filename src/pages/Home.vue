@@ -27,17 +27,7 @@
       </div>
     </section>
 
-    <div class="row g-4">
-      <div class="col-md-4" v-for="card in cards" :key="card.title">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">{{ card.title }}</h5>
-            <p class="card-text" v-html="card.description"></p>
-            <router-link class="btn btn-primary" :to="card.link">Open</router-link>
-          </div>
-        </div>
-      </div>
-    </div>
+
   </div>
 </template>
 
@@ -47,12 +37,6 @@ import { getContentList, getDescriptionHead } from '../services/apiService'
 import { getImages, initItemMedia } from '../services/mediaService'
 
 const bannerUrl = '/assets/banner-1900.jpg'
-
-const cards = [
-  { title: 'News', description: 'Browse the latest news content.', link: '/news' },
-  { title: 'Clubs', description: 'Explore club activities and details.', link: '/clubs' },
-  { title: 'Calendar', description: 'View the calendar and event details.', link: '/calendar' }
-]
 
 const latestNews = ref([])
 const loading = ref(true)
