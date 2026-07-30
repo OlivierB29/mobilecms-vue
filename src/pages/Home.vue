@@ -8,7 +8,7 @@
     <section class="mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4 mb-0">Actualités</h2>
-        <router-link class="btn btn-outline-primary btn-sm" to="/news">View all</router-link>
+        <router-link class="btn btn-outline-primary btn-sm" to="/news">Tout voir</router-link>
       </div>
 
       <div v-if="loading" class="alert alert-info">Loading latest news...</div>
@@ -32,7 +32,7 @@
         <div class="card h-100 shadow-sm">
           <div class="card-body">
             <h5 class="card-title">{{ card.title }}</h5>
-            <p class="card-text">{{ card.description }}</p>
+            <p class="card-text" v-html="card.description"></p>
             <router-link class="btn btn-primary" :to="card.link">Open</router-link>
           </div>
         </div>

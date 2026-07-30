@@ -1,14 +1,13 @@
 <template>
   <div class="container py-4">
-    <h2>News Details</h2>
-    <p class="text-muted">Showing details for news item {{ id }}.</p>
 
     <div v-if="loading" class="alert alert-info">Loading news details...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-else-if="news" class="card shadow-sm">
       <div class="card-body">
         <h3 class="card-title">{{ news.title || news.name || `News Item ${id}` }}</h3>
-        <p class="card-text">{{ news.content || news.description || news.body || 'No details available.' }}</p>
+        <div class="card-text" v-html="news.description"></div>
+        
         <pre v-if="news && !news.content && !news.description && !news.body" class="mt-3">{{ news }}</pre>
       </div>
     </div>

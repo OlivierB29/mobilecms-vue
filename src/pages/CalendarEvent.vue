@@ -8,7 +8,7 @@
     <div v-else-if="eventData" class="card shadow-sm">
       <div class="card-body">
         <h3 class="card-title">{{ eventData.title || eventData.name || `Event ${id}` }}</h3>
-        <p class="card-text">{{ eventData.description || eventData.details || eventData.body || 'No details available.' }}</p>
+        <p class="card-text" v-html="eventData.description || eventData.details || eventData.body || 'No details available.'"></p>
         <div class="mt-3">
           <div v-if="eventData.date"><strong>Date:</strong> {{ eventData.date }}</div>
           <div v-if="eventData.location"><strong>Location:</strong> {{ eventData.location }}</div>
