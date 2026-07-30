@@ -1,7 +1,7 @@
 <template>
   <div class="container py-4">
     <h2>Clubs</h2>
-    <p class="text-muted">Browse clubs and their activity groups.</p>
+    <p class="text-muted">Liste des clubs</p>
 
     <div v-if="loading" class="alert alert-info">Loading clubs...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
@@ -20,8 +20,8 @@
                 <span class="badge bg-secondary">{{ club.activity || 'club' }}</span>
               </div>
               <div class="mt-3 d-flex flex-wrap gap-2">
-                <router-link :to="`/club/${encodeURIComponent(club.id)}`" class="btn btn-outline-primary btn-sm">Open</router-link>
-                <router-link v-if="club.coordinates" :to="`/clubmap/${encodeURIComponent(club.activity || 'all')}`" class="btn btn-outline-secondary btn-sm">Map</router-link>
+                <router-link :to="`/club/${encodeURIComponent(club.id)}`" class="btn btn-outline-primary btn-sm">Informations</router-link>
+                
               </div>
             </div>
           </div>

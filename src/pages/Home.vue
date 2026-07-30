@@ -1,19 +1,13 @@
 <template>
   <div class="home-page container py-4">
     <div class="mb-4 text-center">
-      <img :src="bannerUrl" alt="Banner" class="img-fluid rounded shadow-sm" />
+      <img :src="bannerUrl" alt="Banner" class="img-fluid rounded shadow-sm" :title="siteDescription" />
     </div>
 
-    <section class="mb-4 bg-white rounded shadow-sm p-4">
-      <h2>{{ siteTitle }}</h2>
-      <p class="lead">
-        {{ siteDescription }}
-      </p>
-    </section>
 
     <section class="mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 mb-0">Latest news</h2>
+        <h2 class="h4 mb-0">Actualités</h2>
         <router-link class="btn btn-outline-primary btn-sm" to="/news">View all</router-link>
       </div>
 
