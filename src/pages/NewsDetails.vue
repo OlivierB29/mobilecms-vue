@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getContentById } from '../services/apiService'
 import { initItemMedia, getImages, getAttachments } from '../services/mediaService'

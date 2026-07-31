@@ -5,33 +5,13 @@
 
     <div v-if="loading" class="alert alert-info">Loading club locations...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-else>
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <div class="row g-3">
-            <div v-for="club in clubs" :key="club.id" class="col-md-6">
-              <div class="border rounded p-3 h-100">
-                <div class="fw-semibold">{{ club.title || club.name || club.id }}</div>
-                <div class="small text-muted">{{ club.city || 'Location not available' }}</div>
-                <div class="mt-2 d-flex gap-2">
-                  <router-link :to="`/club/${encodeURIComponent(club.id)}`" class="btn btn-outline-primary btn-sm">Open</router-link>
-                  <a v-if="club.coordinates" :href="getMapsUrl(club.coordinates)" target="_blank" rel="noreferrer" class="btn btn-outline-secondary btn-sm">Directions</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getContentList } from '../services/apiService'
 import { env } from '../env'
-import { buildCoordinateModel, convertGpsToXY, getVector } from '../services/coordinates'
 
 const props = defineProps({
   activity: {
@@ -52,48 +32,6 @@ const poiMarkers = ref([
 
 const mapAssetUrl = computed(() => `${env.assetBaseUrl}/map.svg`)
 
-function getMapsUrl(coordinates) {
-  return `https://www.google.com/maps?q=${encodeURIComponent(coordinates)}`
-}
-
-function mapClubs(clubList) {
-  const firstPoi = buildCoordinateModel('48.394157, -4.486726', '330, 110')
-  const lastPoi = buildCoordinateModel('48.111990, -1.678607', '728, 600')
-  const vector = buildCoordinateModel(getVector(firstPoi.gps, lastPoi.gps), getVector(firstPoi.map, lastPoi.map))
-
-  return clubList
-    .filter((club) => club.coordinates)
-    .map((club) => {
-      const coord = club.coordinates.replace(/\s+/g, '').split(',').filter(Boolean).map((value) => Number.parseFloat(value))
-      const point = convertGpsToXY(coord, firstPoi, vector)
-
-      return {
-        id: club.id,
-        title: club.title || club.name || club.id,
-        x: point[0],
-        y: point[1]
-      }
-    })
-}
-
-onMounted(() => {
-  getContentList('clubs')
-    .then((data) => {
-      const list = data || []
-      const filtered = props.activity
-        ? list.filter((club) => club.activity === props.activity || club.category === props.activity)
-        : list
-
-      clubs.value = filtered
-      markers.value = mapClubs(filtered)
-    })
-    .catch((err) => {
-      error.value = err.message || 'Failed to load clubs.'
-    })
-    .finally(() => {
-      loading.value = false
-    })
-})
 </script>
 
 <style scoped>

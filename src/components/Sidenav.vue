@@ -20,7 +20,7 @@
   </nav>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import SocialLinks from './SocialLinks.vue'
 import { getMenuData } from '../services/menuService'
