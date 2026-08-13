@@ -5,8 +5,7 @@
 
     <ul v-else class="list-group">
       <li v-for="item in newsItems" :key="item.id" class="list-group-item d-flex justify-content-between align-items-center">
-        <span>{{ item.title || item.name || item.id }}</span>
-        <router-link class="btn btn-outline-primary btn-sm" :to="`/news/${item.id}`">Open</router-link>
+        <router-link class="btn btn-outline-primary btn-sm" :to="`/news/${item.id}`">{{ item.title || item.name || item.id }}</router-link>
       </li>
     </ul>
   </div>
@@ -16,16 +15,23 @@
 import { ref, onMounted } from 'vue'
 import { getContentList } from '../services/apiService'
 
-const newsItems = ref([])
-const loading = ref(true)
-const error = ref(null)
+type NewsPreviewItem = {
+  id?: string | number
+  title?: string
+  name?: string
+  [key: string]: any
+}
+
+const newsItems = ref<NewsPreviewItem[]>([])
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
 
 onMounted(() => {
   getContentList('news')
-    .then((data) => {
+    .then((data: NewsPreviewItem[]) => {
       newsItems.value = data || []
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load news.'
     })
     .finally(() => {

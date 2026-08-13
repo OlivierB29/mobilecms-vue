@@ -20,7 +20,7 @@
             <div class="card-body">
               <h5 class="card-title">{{ item.title || item.name || item.id }}</h5>
               <p class="card-text" v-html="getText(item)"></p>
-              <router-link class="btn btn-primary btn-sm" :to="`/news/${item.id}`">Read more</router-link>
+              <router-link class="btn btn-primary btn-sm" :to="`/news/${item.id}`">Ouvrir</router-link>
             </div>
           </div>
         </div>
@@ -36,25 +36,39 @@ import { computed, onMounted, ref } from 'vue'
 import { getContentList, getDescriptionHead } from '../services/apiService'
 import { getImages, initItemMedia } from '../services/mediaService'
 
-const bannerUrl = '/assets/banner-1900.jpg'
-
-const latestNews = ref([])
-const loading = ref(true)
-const error = ref(null)
-const metadata = ref({})
-const siteTitle = computed(() => metadata.value.title || 'mobilecms')
-const siteDescription = computed(() => metadata.value.fulltitle || 'MobileCMS content portal')
-
-function getNewsDate(item) {
-  return item.date || item.updated || item.created || item.publish_date || ''
+type NewsItem = {
+  id?: string | number
+  slug?: string
+  name?: string
+  title?: string
+  description?: string
+  details?: string
+  body?: string
+  summary?: string
+  date?: string
+  updated?: string
+  created?: string
+  publish_date?: string
+  image?: { url?: string; title?: string } | null
+  [key: string]: unknown
 }
 
-function sortLatestNews(items) {
-  return [...items].sort((a, b) => {
+const bannerUrl = '/assets/banner-1900.jpg'
 
+const latestNews = ref<NewsItem[]>([])
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
+const metadata = ref<Record<string, any>>({})
+const siteDescription = computed(() => metadata.value.fulltitle || 'MobileCMS content portal')
+
+function getNewsDate(item: NewsItem): string {
+  return String(item.date || item.updated || item.created || item.publish_date || '')
+}
+
+function sortLatestNews(items: NewsItem[]): NewsItem[] {
+  return [...items].sort((a, b) => {
     const aDate = Date.parse(getNewsDate(a))
     const bDate = Date.parse(getNewsDate(b))
-
 
     if (!Number.isNaN(aDate) && !Number.isNaN(bDate)) {
       return bDate - aDate
@@ -67,18 +81,17 @@ function sortLatestNews(items) {
   }).slice(0, 6)
 }
 
-function getText(item) {
-  const text = item.description || item.details || item.body || item.summary || ''
+function getText(item: NewsItem): string {
+  const text = String(item.description || item.details || item.body || item.summary || '')
   const plainText = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
   return plainText
 }
 
-function normalizeNews(items) {
-
+function normalizeNews(items: NewsItem[] | null | undefined): NewsItem[] {
   return sortLatestNews((items || []).map((item) => {
-    const itemId = item.id || item.slug || item.name || ''
-    const initialized = initItemMedia('news', itemId, item)
-    const images = getImages(initialized)
+    const itemId = String(item.id || item.slug || item.name || '')
+    const initialized = initItemMedia('news', itemId, item) as NewsItem
+    const images = getImages(initialized as any)
     return {
       ...initialized,
       image: images[0] || null

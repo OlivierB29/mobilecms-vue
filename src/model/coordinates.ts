@@ -2,39 +2,39 @@
 export class Coordinates {
 
   constructor( gps: Array<number>, map: Array<number> ) {
-    this.gps = gps;
-    this.map = map;
+    this.gps = gps
+    this.map = map
   }
 
-  public gps: Array<number> = [];
-  public map: Array<number> = [];
+  public gps: Array<number> = []
+  public map: Array<number> = []
 
   getLongitude() {
-    return this.gps[1];
+    return this.gps[1]
   }
 
 
   getLatitude() {
-    return this.gps[0];
+    return this.gps[0]
   }
 
 
   public static parseCoordinates(coordinates: string) : Array<number> {
-    let coord = coordinates.replace(' ', '');
+    let coord = coordinates.replace(' ', '')
 
-    let strArray = coord.split(',');
-    let result : Array<number> = <any>[];
+    let strArray = coord.split(',')
+    let result : Array<number> = []
     strArray.forEach((val: any) => {
 
-      result.push(Number.parseFloat(val));
-    });
+      result.push(Number.parseFloat(val))
+    })
 
 
-    return result;
+    return result
   }
 
   public static  parse(gps: string, map: string): Coordinates {
-    return new Coordinates(Coordinates.parseCoordinates(gps), Coordinates.parseCoordinates(map));
+    return new Coordinates(Coordinates.parseCoordinates(gps), Coordinates.parseCoordinates(map))
   }
 
   }
