@@ -58,6 +58,22 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { getContentById } from '../services/apiService'
 import { initItemMedia, getImages, getAttachments } from '../services/mediaService'
 
+type DetailItem = {
+  id?: string | number
+  title?: string
+  name?: string
+  description?: string
+  details?: string
+  body?: string
+  date?: string
+  location?: string
+  url?: string
+  attachments?: any[]
+  media?: any[]
+  images?: any[]
+  [key: string]: any
+}
+
 const props = defineProps({
   type: {
     type: String,
@@ -69,36 +85,28 @@ const props = defineProps({
   }
 })
 
-const item = ref(null)
-const loading = ref(true)
-const error = ref(null)
+const item = ref<DetailItem | null>(null)
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
 
 const typeLabel = computed(() => props.type.charAt(0).toUpperCase() + props.type.slice(1))
 const title = computed(() => `${typeLabel.value} details`)
-const images = computed(() => getImages(item.value))
-const attachments = computed(() => getAttachments(item.value))
+const images = computed(() => getImages((item.value ?? {}) as any))
+const attachments = computed(() => getAttachments((item.value ?? {}) as any))
 
 const fetchContent = () => {
   loading.value = true
   error.value = null
   getContentById(props.type, props.id)
-    .then((data) => {
+    .then((data: DetailItem) => {
       item.value = initItemMedia(props.type, props.id, data)
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load item details.'
     })
     .finally(() => {
       loading.value = false
     })
-}
-
-
-if (props) {
-  console.log('type:', props.type)
-  console.log('id:', props.id)
-} else {
-  console.log('props is undefined')
 }
 
 onMounted(() => {

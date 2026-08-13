@@ -20,7 +20,7 @@
                 <span class="badge bg-secondary">{{ club.activity || 'club' }}</span>
               </div>
               <div class="mt-3 d-flex flex-wrap gap-2">
-                <router-link :to="`/club/${encodeURIComponent(club.id)}`" class="btn btn-outline-primary btn-sm">Informations</router-link>
+                <router-link :to="`/club/${encodeURIComponent(String(club.id ?? ''))}`" class="btn btn-outline-primary btn-sm">Informations</router-link>
                 
               </div>
             </div>
@@ -34,18 +34,26 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getContentList } from '../services/apiService'
-import ViewRegionalMap from '../components/ViewRegionalMap.vue'
 
-const clubs = ref([])
-const loading = ref(true)
-const error = ref(null)
+type ClubItem = {
+  id?: string | number
+  title?: string
+  name?: string
+  city?: string
+  activity?: string
+  [key: string]: any
+}
+
+const clubs = ref<ClubItem[]>([])
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
 
 onMounted(() => {
   getContentList('clubs')
-    .then((data) => {
+    .then((data: ClubItem[]) => {
       clubs.value = data || []
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load clubs.'
     })
     .finally(() => {

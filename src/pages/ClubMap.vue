@@ -9,8 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { getContentList } from '../services/apiService'
+import { computed, ref } from 'vue'
 import { env } from '../env'
 
 const props = defineProps({
@@ -21,17 +20,11 @@ const props = defineProps({
 })
 
 const activityLabel = computed(() => props.activity || 'all')
-const clubs = ref([])
-const loading = ref(true)
-const error = ref(null)
-const markers = ref([])
-const poiMarkers = ref([
-  { id: 'firstpoi', name: 'Roscoff', x: 330, y: 110 },
-  { id: 'lastpoi', name: 'Penestin', x: 728, y: 600 }
-])
-
+const loading = ref(false)
+const error = ref<string | null>(null)
 const mapAssetUrl = computed(() => `${env.assetBaseUrl}/map.svg`)
 
+void mapAssetUrl
 </script>
 
 <style scoped>

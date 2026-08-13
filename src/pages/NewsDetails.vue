@@ -40,15 +40,24 @@ import { ref, computed, onMounted } from 'vue'
 import { getContentById } from '../services/apiService'
 import { initItemMedia, getImages, getAttachments } from '../services/mediaService'
 
+type NewsRecord = {
+  id?: string | number
+  title?: string
+  description?: string
+  body?: string
+  content?: string
+  [key: string]: any
+}
+
 const props = defineProps({
   id: String
 })
 
-const news = ref(null)
-const loading = ref(true)
-const error = ref(null)
-const images = computed(() => getImages(news.value))
-const attachments = computed(() => getAttachments(news.value))
+const news = ref<NewsRecord | null>(null)
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
+const images = computed(() => getImages((news.value ?? {}) as any))
+const attachments = computed(() => getAttachments((news.value ?? {}) as any))
 
 onMounted(() => {
   if (!props.id) {
@@ -57,11 +66,13 @@ onMounted(() => {
     return
   }
 
-  getContentById('news', props.id)
-    .then((data) => {
-      news.value = initItemMedia('news', props.id, data)
+  const newsId = String(props.id)
+
+  getContentById('news', newsId)
+    .then((data: NewsRecord) => {
+      news.value = initItemMedia('news', newsId, data)
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load news details.'
     })
     .finally(() => {

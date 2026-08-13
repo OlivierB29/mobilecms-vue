@@ -47,6 +47,18 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { getContentList } from '../services/apiService'
 
+type CollectionItem = {
+  id?: string | number
+  url?: string
+  title?: string
+  name?: string
+  description?: string
+  subtitle?: string
+  attachments?: Array<{ title?: string; name?: string; url?: string }>
+  media?: Array<{ title?: string; name?: string; url?: string }>
+  [key: string]: any
+}
+
 const props = defineProps({
   type: {
     type: String,
@@ -55,7 +67,7 @@ const props = defineProps({
 })
 
 const title = computed(() => {
-  const labels = {
+  const labels: Record<string, string> = {
     structure: 'Structure',
     contacts: 'Contacts',
     reports: 'Reports',
@@ -64,16 +76,16 @@ const title = computed(() => {
   }
   return labels[props.type] || props.type.charAt(0).toUpperCase() + props.type.slice(1)
 })
-const items = ref([])
-const loading = ref(true)
-const error = ref(null)
+const items = ref<CollectionItem[]>([])
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
 
-function getDetailRoute(id) {
-  return `/${props.type}/${encodeURIComponent(id)}`
+function getDetailRoute(id: string | number) {
+  return `/${props.type}/${encodeURIComponent(String(id))}`
 }
 
-function getQuickLinks(item) {
-  const links = []
+function getQuickLinks(item: CollectionItem) {
+  const links: Array<{ title: string; url: string }> = []
 
   if (Array.isArray(item.attachments)) {
     item.attachments.forEach((entry) => {
@@ -100,10 +112,10 @@ function loadItems() {
   items.value = []
 
   getContentList(props.type)
-    .then((data) => {
+    .then((data: CollectionItem[]) => {
       items.value = data || []
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || `Failed to load ${props.type}.`
     })
     .finally(() => {

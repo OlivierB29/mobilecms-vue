@@ -17,14 +17,14 @@
 import { computed, onMounted, ref } from 'vue'
 import { getDescriptionHead } from '../services/apiService'
 
-const metadata = ref({})
+const metadata = ref<Record<string, any>>({})
 const title = computed(() => metadata.value.title || 'mobilecms')
 const fullTitle = computed(() => metadata.value.fulltitle || title.value)
 const keywords = computed(() => {
-  const raw = metadata.value.keywords || ''
+  const raw = String(metadata.value.keywords || '')
   return raw
     .split(',')
-    .map((value) => value.trim())
+    .map((value: string) => value.trim())
     .filter(Boolean)
 })
 

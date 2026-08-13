@@ -23,13 +23,25 @@
 import { ref, onMounted } from 'vue'
 import { getContentById } from '../services/apiService'
 
+type EventRecord = {
+  id?: string | number
+  title?: string
+  name?: string
+  description?: string
+  details?: string
+  body?: string
+  date?: string
+  location?: string
+  [key: string]: any
+}
+
 const props = defineProps({
   id: String
 })
 
-const eventData = ref(null)
-const loading = ref(true)
-const error = ref(null)
+const eventData = ref<EventRecord | null>(null)
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
 
 onMounted(() => {
   if (!props.id) {
@@ -39,10 +51,10 @@ onMounted(() => {
   }
 
   getContentById('calendar', props.id)
-    .then((data) => {
+    .then((data: EventRecord) => {
       eventData.value = data
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load event details.'
     })
     .finally(() => {
