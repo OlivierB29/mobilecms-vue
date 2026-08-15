@@ -1,55 +1,119 @@
 <template>
-  <div class="container py-4">
-    <h2>Club map</h2>
-    <p class="text-muted">Locations for clubs in the {{ activityLabel }} group.</p>
+  <div id="map">
+    <div v-if="loading" class="map-status">Loading clubs...</div>
+    <div v-else-if="error" class="map-status error">{{ error }}</div>
 
-    <div v-if="loading" class="alert alert-info">Loading club locations...</div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+    <l-map ref="map" v-model:zoom="zoom" :center="defaultCenter">
+      <l-tile-layer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        layer-type="base"
+        name="OpenStreetMap"
+      ></l-tile-layer>
+
+      <template v-for="club in clubs" :key="club.id ?? `club-${club.city ?? club.title ?? club.name ?? Math.random()}`">
+        <l-marker v-if="hasCoordinates(club.coordinates)" :lat-lng="getCoordinates(club.coordinates)">
+          <l-popup>
+            <div>
+              <strong>
+                {{ club.title || club.name || 'Club' }}
+                <span v-if="club.activity">- {{ club.activity }}</span>
+              </strong>
+              <div v-if="club.city">{{ club.city }}</div>
+            </div>
+          </l-popup>
+        </l-marker>
+      </template>
+    </l-map>
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { env } from '../env'
+<script>
+import "leaflet/dist/leaflet.css";
+import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
+import { getContentList } from "../services/apiService";
 
-const props = defineProps({
-  activity: {
-    type: String,
-    default: null
-  }
-})
+export default {
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+  },
+  data() {
+    return {
+      zoom: 9,
+      clubs: [],
+      loading: true,
+      error: null,
+      defaultCenter: [48.233, -3.014],
+    };
+  },
+  computed: {
+    map() {
+      return this.$refs.map?.leafletObject;
+    },
+  },
+  mounted() {
+    this.loadClubs();
+  },
+  methods: {
+    hasCoordinates(value) {
+      if (!value) return false;
+      const [lat, lng] = String(value)
+        .split(",")
+        .map((part) => Number.parseFloat(String(part).trim()));
+      return Number.isFinite(lat) && Number.isFinite(lng);
+    },
+    getCoordinates(value) {
+      const [lat, lng] = String(value)
+        .split(",")
+        .map((part) => Number.parseFloat(String(part).trim()));
+      return [lat, lng];
+    },
+    async loadClubs() {
+      try {
+        const data = await getContentList("clubs");
+        this.clubs = Array.isArray(data) ? data : [];
 
-const activityLabel = computed(() => props.activity || 'all')
-const loading = ref(false)
-const error = ref<string | null>(null)
-const mapAssetUrl = computed(() => `${env.assetBaseUrl}/map.svg`)
+        const points = this.clubs
+          .map((club) => club?.coordinates)
+          .filter((value) => this.hasCoordinates(value))
+          .map((coordinates) => this.getCoordinates(coordinates));
 
-void mapAssetUrl
+        if (points.length > 0 && this.map) {
+          this.$nextTick(() => {
+            this.map.fitBounds(points, { padding: [30, 30] });
+          });
+        }
+      } catch (err) {
+        this.error = err?.message || "Failed to load clubs.";
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+};
 </script>
 
-<style scoped>
-.marker-link {
+<style>
+#map {
   position: absolute;
-  transform: translate(-50%, -50%);
-  text-decoration: none;
+  top: 0;
+  bottom: 0;
+  width: 100%;
 }
 
-.marker-badge {
-  display: inline-block;
-  color: #dc2626;
-  font-size: 1.2rem;
-  line-height: 1;
-  text-shadow: 0 0 3px white;
+.map-status {
+  position: absolute;
+  z-index: 500;
+  left: 12px;
+  top: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
 }
 
-.poi-marker {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #2563eb;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+.map-status.error {
+  color: #b00020;
 }
 </style>
