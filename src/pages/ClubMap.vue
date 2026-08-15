@@ -23,6 +23,9 @@
                 <span v-if="club.activity">- {{ club.activity }}</span>
               </strong>
               <div v-if="club.city">{{ club.city }}</div>
+              <div v-if="club.id">
+                <a :href="`#/club/${encodeURIComponent(String(club.id))}`">Voir le club</a>
+              </div>
             </div>
           </l-popup>
         </l-marker>
