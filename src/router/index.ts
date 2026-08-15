@@ -24,12 +24,12 @@ const routes = [
   { path: '/actualites', name: 'Actualites', component: NewsPreview },
   { path: '/actualites/:id', name: 'ActualitesDetails', component: NewsDetails, props: true },
 
-  { path: '/clubs', name: 'Clubs', component: ClubActivities },
+  { path: '/clublist', name: 'ClubList', component: ClubActivities },
   { path: '/clubactivities', name: 'ClubActivities', component: ClubActivities },
-  { path: '/clubmap', name: 'ClubMap', component: ClubMap },
-  { path: '/clubmap/:activity', name: 'ClubMapActivity', component: ClubMap, props: true },
+  { path: '/clubs', name: 'ClubMap', component: ClubMap },
+  { path: '/clubs/:activity', name: 'ClubMapActivity', component: ClubMap, props: true },
   { path: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true },
-  { path: '/clubs/:activity', name: 'ClubsActivity', component: ClubActivities, props: true },
+  { path: '/clublist/:activity', name: 'ClubListActivity', component: ClubActivities, props: true },
 
   { path: '/calendar', name: 'Calendar', component: CalendarPage },
   { path: '/calendrier', name: 'Calendrier', component: CalendarPage },
