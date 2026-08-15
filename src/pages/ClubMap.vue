@@ -90,18 +90,35 @@ export default {
       const activity = this.getActivityForClub(club);
       const fileName = activity?.mapicon || activity?.logo || "";
       const activityId = activity?.id || String(club?.activity || "").trim();
+      const activityColor = activity?.rgbcolor || activity?.color || "#4f46e5";
 
-      if (!fileName || !activityId) {
-        return undefined;
-      }
+      const iconUrl = fileName && activityId ? this.buildMediaUrl("activities", activityId, fileName) : "";
 
-      const iconUrl = this.buildMediaUrl("activities", activityId, fileName);
+      const innerHtml = iconUrl
+        ? `<img src="${iconUrl}" alt="" style="width: 20px; height: 20px; object-fit: contain; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));" />`
+        : `<span style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.9); display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);"></span>`;
 
-      return L.icon({
-        iconUrl,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -16],
+      return L.divIcon({
+        className: "club-activity-marker",
+        html: `
+          <div style="
+            position: relative;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: ${activityColor};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.28);
+            border: 2px solid rgba(255,255,255,0.9);
+          ">
+            ${innerHtml}
+          </div>
+        `,
+        iconSize: [42, 42],
+        iconAnchor: [21, 21],
+        popupAnchor: [0, -20],
       });
     },
     hasCoordinates(value) {

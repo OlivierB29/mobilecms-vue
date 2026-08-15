@@ -26,7 +26,7 @@ const routes = [
 
   { path: '/clublist', name: 'ClubList', component: ClubActivities },
   { path: '/clubactivities', name: 'ClubActivities', component: ClubActivities },
-  { path: '/clubs', name: 'ClubMap', component: ClubMap },
+  { path: '/clubs', name: 'Carte', component: ClubMap },
   { path: '/clubs/:activity', name: 'ClubMapActivity', component: ClubMap, props: true },
   { path: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true },
   { path: '/clublist/:activity', name: 'ClubListActivity', component: ClubActivities, props: true },
