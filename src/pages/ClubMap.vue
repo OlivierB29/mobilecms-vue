@@ -89,12 +89,12 @@ export default {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: transparent;
+            background: ${activityColor};
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 3px 8px rgba(0,0,0,0.28);
-            border: 3px solid ${activityColor};
+            border: 2px solid rgba(255,255,255,0.9);
           ">
             ${innerHtml}
           </div>
