@@ -1,6 +1,11 @@
 <template>
   <div class="container py-4">
-    <h2>Clubs</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Clubs</h2>
+      <router-link to="/carte" class="btn btn-outline-secondary btn-sm d-flex gap-2">
+        <i class="bi bi-map"></i> Carte
+      </router-link>
+    </div>
     <p class="text-muted">Liste des clubs</p>
 
     <div v-if="loading" class="alert alert-info">Loading clubs...</div>

@@ -24,10 +24,9 @@ const routes = [
   { path: '/actualites', name: 'Actualites', component: NewsPreview },
   { path: '/actualites/:id', name: 'ActualitesDetails', component: NewsDetails, props: true },
 
-  { path: '/clublist', name: 'ClubList', component: ClubActivities },
   { path: '/clubactivities', name: 'ClubActivities', component: ClubActivities },
-  { path: '/clubs', name: 'Carte', component: ClubMap },
-  { path: '/clubs/:activity', name: 'ClubMapActivity', component: ClubMap, props: true },
+  { path: '/carte', name: 'Carte', component: ClubMap },
+  { path: '/clublist', name: 'ClubList', component: ClubActivities, props: true },
   { path: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true },
   { path: '/clublist/:activity', name: 'ClubListActivity', component: ClubActivities, props: true },
 

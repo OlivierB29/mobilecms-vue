@@ -1,7 +1,7 @@
 export function getMenuData(_language = 'en') {
   return [
     { id: 'news', routerLink: '/actualites', title: 'Actualités', icon: 'bi-newspaper', order: 1 },
-    { id: 'clubs', routerLink: '/clubs', title: 'Clubs', icon: 'bi-geo-alt', order: 2 },
+    { id: 'clubs', routerLink: '/clublist', title: 'Clubs', icon: 'bi-geo-alt', order: 2 },
     { id: 'calendar', routerLink: '/calendrier', title: 'Calendriers', icon: 'bi-calendar4-range', order: 3 },
     { id: 'structure', routerLink: '/structure', title: 'Organisation', icon: 'bi-people', order: 4 },
     { id: 'documents', routerLink: '/documents', title: 'Documents', icon: 'bi-file-richtext', order: 5 },
