@@ -9,34 +9,16 @@
         layer-type="base"
         name="OpenStreetMap"
       ></l-tile-layer>
-
-      <template v-for="club in clubs" :key="club.id ?? `club-${club.city ?? club.title ?? club.name ?? Math.random()}`">
-        <l-marker
-          v-if="hasCoordinates(club.coordinates)"
-          :lat-lng="getCoordinates(club.coordinates)"
-          :icon="getMarkerIcon(club)"
-        >
-          <l-popup>
-            <div>
-              <strong>
-                {{ club.title || club.name || 'Club' }}
-                <span v-if="club.activity">- {{ club.activity }}</span>
-              </strong>
-              <div v-if="club.city">{{ club.city }}</div>
-              <div v-if="club.id">
-                <a :href="`#/club/${encodeURIComponent(String(club.id))}`">Voir le club</a>
-              </div>
-            </div>
-          </l-popup>
-        </l-marker>
-      </template>
     </l-map>
   </div>
 </template>
 
 <script>
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import L from "leaflet";
+import "leaflet.markercluster";
 import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
 import { getContentList } from "../services/apiService";
 
@@ -57,6 +39,7 @@ export default {
       loading: true,
       error: null,
       defaultCenter: [48.233, -3.014],
+      markerClusterGroup: null,
     };
   },
   computed: {
@@ -134,6 +117,47 @@ export default {
         .map((part) => Number.parseFloat(String(part).trim()));
       return [lat, lng];
     },
+    initializeMarkerCluster() {
+      if (!this.map) return;
+
+      // Remove existing cluster group if present
+      if (this.markerClusterGroup) {
+        this.map.removeLayer(this.markerClusterGroup);
+      }
+
+      // Create new marker cluster group
+      this.markerClusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 80,
+        showCoverageOnHover: true,
+      });
+
+      // Add markers to cluster group
+      this.clubs.forEach((club) => {
+        if (this.hasCoordinates(club.coordinates)) {
+          const marker = L.marker(this.getCoordinates(club.coordinates), {
+            icon: this.getMarkerIcon(club),
+          });
+
+          // Add popup with club information
+          const popupContent = `
+            <div>
+              <strong>
+                ${club.title || club.name || 'Club'}
+                ${club.activity ? `- ${club.activity}` : ''}
+              </strong>
+              ${club.city ? `<div>${club.city}</div>` : ''}
+              ${club.id ? `<div><a href="#/club/${encodeURIComponent(String(club.id))}">Voir le club</a></div>` : ''}
+            </div>
+          `;
+
+          marker.bindPopup(popupContent);
+          this.markerClusterGroup.addLayer(marker);
+        }
+      });
+
+      // Add cluster group to map
+      this.map.addLayer(this.markerClusterGroup);
+    },
     async loadActivities() {
       try {
         const data = await getContentList("activities");
@@ -155,6 +179,7 @@ export default {
 
         if (points.length > 0 && this.map) {
           this.$nextTick(() => {
+            this.initializeMarkerCluster();
             this.map.fitBounds(points, { padding: [30, 30] });
           });
         }
