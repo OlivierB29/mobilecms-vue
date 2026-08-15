@@ -14,7 +14,7 @@
         />
       </div>
       <div class="col-md-4 col-lg-3 d-flex gap-2">
-        <button type="button" class="btn btn-primary w-100" @click="applySearch">Search</button>
+        <button type="button" class="btn btn-primary w-100" @click="applySearch">Rechercher</button>
         <button
           v-if="searchTerm"
           type="button"
