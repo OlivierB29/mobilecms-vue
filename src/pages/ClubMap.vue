@@ -95,8 +95,8 @@ export default {
       const iconUrl = fileName && activityId ? this.buildMediaUrl("activities", activityId, fileName) : "";
 
       const innerHtml = iconUrl
-        ? `<img src="${iconUrl}" alt="" style="width: 20px; height: 20px; object-fit: contain; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));" />`
-        : `<span style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.9); display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);"></span>`;
+        ? `<img src="${iconUrl}" alt="" style="width: 18px; height: 18px; object-fit: contain; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));" />`
+        : `<span style="width: 14px; height: 14px; border-radius: 50%; background: transparent; display: block;"></span>`;
 
       return L.divIcon({
         className: "club-activity-marker",
@@ -106,12 +106,12 @@ export default {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: ${activityColor};
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 3px 8px rgba(0,0,0,0.28);
-            border: 2px solid rgba(255,255,255,0.9);
+            border: 3px solid ${activityColor};
           ">
             ${innerHtml}
           </div>
