@@ -27,16 +27,26 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getContentList, getDescriptionHead } from '../services/apiService'
 
-const events = ref([])
-const embedUrl = ref('')
-const loading = ref(true)
-const error = ref(null)
+type CalendarItem = {
+  id?: string | number
+  title?: string
+  date?: string
+  datetime?: string
+  status?: string
+  category?: string
+  [key: string]: any
+}
 
-const parseEventDate = (item) => {
+const events = ref<CalendarItem[]>([])
+const embedUrl = ref<string>('')
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
+
+const parseEventDate = (item: CalendarItem): number => {
   const raw = item.date || item.datetime || ''
   const timestamp = Date.parse(raw)
   return Number.isNaN(timestamp) ? 0 : timestamp
@@ -61,14 +71,14 @@ onMounted(() => {
 
       events.value = (calendarData || [])
         .slice()
-        .filter((item) => {
+        .filter((item: CalendarItem) => {
           const ts = parseEventDate(item)
           if (!ts) return false
           return ts >= pastBound.getTime() && ts <= futureBound.getTime()
         })
-        .sort((a, b) => parseEventDate(b) - parseEventDate(a))
+        .sort((a: CalendarItem, b: CalendarItem) => parseEventDate(b) - parseEventDate(a))
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load calendar data.'
     })
     .finally(() => {

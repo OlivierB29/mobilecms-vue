@@ -6,13 +6,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed, type PropType } from 'vue'
+
+type SocialButton = {
+  title?: string
+  href?: string
+  icon?: string
+}
+
 const props = defineProps({
   buttons: {
-    type: Array,
+    type: Array as PropType<SocialButton[]>,
     default: () => []
   }
 })
+
+const buttons = computed(() => props.buttons as SocialButton[])
 </script>
 
 <style scoped>

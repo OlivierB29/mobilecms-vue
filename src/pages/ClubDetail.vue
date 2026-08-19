@@ -30,28 +30,40 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getContentById } from '../services/apiService'
+
+type ClubRecord = {
+  id?: string | number
+  title?: string
+  name?: string
+  description?: string
+  details?: string
+  city?: string
+  activity?: string
+  coordinates?: string
+  [key: string]: any
+}
 
 const props = defineProps({
   id: String
 })
 
-const club = ref(null)
-const loading = ref(true)
-const error = ref(null)
+const club = ref<ClubRecord | null>(null)
+const loading = ref<boolean>(true)
+const error = ref<string | null>(null)
 
 const openStreetMapsUrl = computed(() => {
   if (!club.value?.coordinates) return '#'
-  const [lat, lng] = club.value.coordinates.split(',').map((value) => value.trim())
+  const [lat, lng] = club.value.coordinates.split(',').map((value: string) => value.trim())
   if (!lat || !lng) return '#'
   return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}`
 })
 
 const googleMapsUrl = computed(() => {
   if (!club.value?.coordinates) return '#'
-  const [lat, lng] = club.value.coordinates.split(',').map((value) => value.trim())
+  const [lat, lng] = club.value.coordinates.split(',').map((value: string) => value.trim())
   if (!lat || !lng) return '#'
   return `https://www.google.com/maps?q=${lat},${lng}`
 })
@@ -64,10 +76,10 @@ onMounted(() => {
   }
 
   getContentById('clubs', props.id)
-    .then((data) => {
+    .then((data: ClubRecord) => {
       club.value = data
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       error.value = err.message || 'Failed to load club details.'
     })
     .finally(() => {

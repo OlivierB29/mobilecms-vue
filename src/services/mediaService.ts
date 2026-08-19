@@ -1,7 +1,8 @@
-const mediaBaseUrl = import.meta.env.VITE_MEDIA_BASE_URL || '/media'
-const assetBaseUrl = import.meta.env.VITE_ASSET_BASE_URL || '/assets'
+import type { Item } from "../model/item"
 
-function ensureAbsoluteUrl(value) {
+const mediaBaseUrl = import.meta.env.VITE_MEDIA_BASE_URL || '/media'
+
+function ensureAbsoluteUrl(value : string | null | undefined) {
   if (!value) return ''
   const url = value.toString()
   if (url.startsWith('http') || url.startsWith('//')) {
@@ -10,7 +11,7 @@ function ensureAbsoluteUrl(value) {
   return url
 }
 
-function resolveMediaUrl(type, id, entry) {
+function resolveMediaUrl(type : string, id : string, entry : any) {
   const url = entry.url || entry.path || ''
   const normalized = url.toString()
   if (normalized.startsWith('http') || normalized.startsWith('//')) {
@@ -19,7 +20,7 @@ function resolveMediaUrl(type, id, entry) {
   return `${mediaBaseUrl}/${type}/${id}/${normalized}`
 }
 
-export function initMediaUrl(type, id, media) {
+export function initMediaUrl(type : string, id : string, media : any[]) {
   if (!media) {
     return []
   }
@@ -32,7 +33,7 @@ export function initMediaUrl(type, id, media) {
   })
 }
 
-export function initItemMedia(type, id, item) {
+export function initItemMedia(type : string, id : string, item : any) {
   if (!item) {
     return item
   }
@@ -45,11 +46,11 @@ export function initItemMedia(type, id, item) {
   }
 }
 
-export function isImage(entry) {
+export function isImage(entry : any) {
   return !!entry && typeof entry.mimetype === 'string' && entry.mimetype.includes('image')
 }
 
-export function isVideo(entry) {
+export function isVideo(entry : any) {
   if (!entry || !entry.url) {
     return false
   }
@@ -62,7 +63,7 @@ export function isVideo(entry) {
   )
 }
 
-export function getImages(item) {
+export function getImages(item : Item) {
   const result = []
 
   if (item && Array.isArray(item.images)) {
@@ -76,7 +77,7 @@ export function getImages(item) {
   return result
 }
 
-export function getAttachments(item) {
+export function getAttachments(item : Item) {
   const result = []
 
   if (item && Array.isArray(item.attachments)) {

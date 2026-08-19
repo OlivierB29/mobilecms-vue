@@ -1,7 +1,7 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/mobilecmsapi/v50'
 const contentApi = `${apiBaseUrl}/webapi/content`
 
-async function handleResponse(response) {
+async function handleResponse(response : any) {
   if (!response.ok) {
     const body = await response.text()
     throw new Error(`API error ${response.status}: ${response.statusText} ${body}`)
@@ -9,17 +9,17 @@ async function handleResponse(response) {
   return response.json()
 }
 
-export function getContentList(type) {
+export function getContentList(type : string) {
   return fetch(`${contentApi}/${type}`)
     .then(handleResponse)
 }
 
-export function getContentById(type, id) {
+export function getContentById(type : string, id : string) {
   return fetch(`${contentApi}/${type}/${encodeURIComponent(id)}`)
     .then(handleResponse)
 }
 
 export function getDescriptionHead() {
-  return fetch(`${contentApi}/description/head`)
+  return fetch(`${contentApi}/description/theme`)
     .then(handleResponse)
 }

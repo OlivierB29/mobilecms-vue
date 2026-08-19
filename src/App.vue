@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Sidenav from './components/Sidenav.vue'
 import AppFooter from './components/AppFooter.vue'
 </script>

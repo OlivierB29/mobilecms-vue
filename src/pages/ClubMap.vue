@@ -1,124 +1,217 @@
 <template>
-  <div class="container py-4">
-    <h2>Club map</h2>
-    <p class="text-muted">Locations for clubs in the {{ activityLabel }} group.</p>
+  <div id="map">
+    <div v-if="loading" class="map-status">Loading clubs...</div>
+    <div v-else-if="error" class="map-status error">{{ error }}</div>
 
-    <div v-if="loading" class="alert alert-info">Loading club locations...</div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
-    <div v-else>
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <div class="row g-3">
-            <div v-for="club in clubs" :key="club.id" class="col-md-6">
-              <div class="border rounded p-3 h-100">
-                <div class="fw-semibold">{{ club.title || club.name || club.id }}</div>
-                <div class="small text-muted">{{ club.city || 'Location not available' }}</div>
-                <div class="mt-2 d-flex gap-2">
-                  <router-link :to="`/club/${encodeURIComponent(club.id)}`" class="btn btn-outline-primary btn-sm">Open</router-link>
-                  <a v-if="club.coordinates" :href="getMapsUrl(club.coordinates)" target="_blank" rel="noreferrer" class="btn btn-outline-secondary btn-sm">Directions</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <l-map ref="map" v-model:zoom="zoom" :center="defaultCenter">
+      <l-tile-layer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        layer-type="base"
+        name="OpenStreetMap"
+      ></l-tile-layer>
+    </l-map>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getContentList } from '../services/apiService'
-import { env } from '../env'
-import { buildCoordinateModel, convertGpsToXY, getVector } from '../services/coordinates'
+<script>
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import L from "leaflet";
+import "leaflet.markercluster";
+import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
+import { getContentList } from "../services/apiService";
 
-const props = defineProps({
-  activity: {
-    type: String,
-    default: null
-  }
-})
+const mediaBaseUrl = import.meta.env.VITE_MEDIA_BASE_URL || "/media";
 
-const activityLabel = computed(() => props.activity || 'all')
-const clubs = ref([])
-const loading = ref(true)
-const error = ref(null)
-const markers = ref([])
-const poiMarkers = ref([
-  { id: 'firstpoi', name: 'Roscoff', x: 330, y: 110 },
-  { id: 'lastpoi', name: 'Penestin', x: 728, y: 600 }
-])
-
-const mapAssetUrl = computed(() => `${env.assetBaseUrl}/map.svg`)
-
-function getMapsUrl(coordinates) {
-  return `https://www.google.com/maps?q=${encodeURIComponent(coordinates)}`
-}
-
-function mapClubs(clubList) {
-  const firstPoi = buildCoordinateModel('48.394157, -4.486726', '330, 110')
-  const lastPoi = buildCoordinateModel('48.111990, -1.678607', '728, 600')
-  const vector = buildCoordinateModel(getVector(firstPoi.gps, lastPoi.gps), getVector(firstPoi.map, lastPoi.map))
-
-  return clubList
-    .filter((club) => club.coordinates)
-    .map((club) => {
-      const coord = club.coordinates.replace(/\s+/g, '').split(',').filter(Boolean).map((value) => Number.parseFloat(value))
-      const point = convertGpsToXY(coord, firstPoi, vector)
-
-      return {
-        id: club.id,
-        title: club.title || club.name || club.id,
-        x: point[0],
-        y: point[1]
+export default {
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+  },
+  data() {
+    return {
+      zoom: 9,
+      clubs: [],
+      activities: [],
+      loading: true,
+      error: null,
+      defaultCenter: [48.233, -3.014],
+      markerClusterGroup: null,
+    };
+  },
+  computed: {
+    map() {
+      return this.$refs.map?.leafletObject;
+    },
+  },
+  mounted() {
+    this.loadActivities().then(() => this.loadClubs());
+  },
+  methods: {
+    buildMediaUrl(type, id, filename) {
+      if (!filename) return "";
+      if (filename.startsWith("http") || filename.startsWith("//")) {
+        return filename;
       }
-    })
-}
+      return `${mediaBaseUrl}/${type}/${encodeURIComponent(id)}/${encodeURIComponent(filename)}`;
+    },
+    getActivityForClub(club) {
+      const activityName = String(club?.activity || "").trim().toLowerCase();
+      if (!activityName) return null;
 
-onMounted(() => {
-  getContentList('clubs')
-    .then((data) => {
-      const list = data || []
-      const filtered = props.activity
-        ? list.filter((club) => club.activity === props.activity || club.category === props.activity)
-        : list
+      return this.activities.find((activity) => {
+        const ids = [activity?.id, activity?.name]
+          .filter(Boolean)
+          .map((value) => String(value).trim().toLowerCase());
+        return ids.includes(activityName);
+      }) || null;
+    },
+    getMarkerIcon(club) {
+      const activity = this.getActivityForClub(club);
+      const fileName = activity?.mapicon || activity?.logo || "";
+      const activityId = activity?.id || String(club?.activity || "").trim();
+      const activityColor = activity?.rgbcolor || activity?.color || "#4f46e5";
 
-      clubs.value = filtered
-      markers.value = mapClubs(filtered)
-    })
-    .catch((err) => {
-      error.value = err.message || 'Failed to load clubs.'
-    })
-    .finally(() => {
-      loading.value = false
-    })
-})
+      const iconUrl = fileName && activityId ? this.buildMediaUrl("activities", activityId, fileName) : "";
+
+      const innerHtml = iconUrl
+        ? `<img src="${iconUrl}" alt="" style="width: 18px; height: 18px; object-fit: contain; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));" />`
+        : `<span style="width: 14px; height: 14px; border-radius: 50%; background: transparent; display: block;"></span>`;
+
+      return L.divIcon({
+        className: "club-activity-marker",
+        html: `
+          <div style="
+            position: relative;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: ${activityColor};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.28);
+            border: 2px solid rgba(255,255,255,0.9);
+          ">
+            ${innerHtml}
+          </div>
+        `,
+        iconSize: [42, 42],
+        iconAnchor: [21, 21],
+        popupAnchor: [0, -20],
+      });
+    },
+    hasCoordinates(value) {
+      if (!value) return false;
+      const [lat, lng] = String(value)
+        .split(",")
+        .map((part) => Number.parseFloat(String(part).trim()));
+      return Number.isFinite(lat) && Number.isFinite(lng);
+    },
+    getCoordinates(value) {
+      const [lat, lng] = String(value)
+        .split(",")
+        .map((part) => Number.parseFloat(String(part).trim()));
+      return [lat, lng];
+    },
+    initializeMarkerCluster() {
+      if (!this.map) return;
+
+      // Remove existing cluster group if present
+      if (this.markerClusterGroup) {
+        this.map.removeLayer(this.markerClusterGroup);
+      }
+
+      // Create new marker cluster group
+      this.markerClusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 80,
+        showCoverageOnHover: true,
+      });
+
+      // Add markers to cluster group
+      this.clubs.forEach((club) => {
+        if (this.hasCoordinates(club.coordinates)) {
+          const marker = L.marker(this.getCoordinates(club.coordinates), {
+            icon: this.getMarkerIcon(club),
+          });
+
+          // Add popup with club information
+          const popupContent = `
+            <div>
+              <strong>
+                ${club.title || club.name || 'Club'}
+                ${club.activity ? `- ${club.activity}` : ''}
+              </strong>
+              ${club.city ? `<div>${club.city}</div>` : ''}
+              ${club.id ? `<div><a href="#/club/${encodeURIComponent(String(club.id))}">Voir le club</a></div>` : ''}
+            </div>
+          `;
+
+          marker.bindPopup(popupContent);
+          this.markerClusterGroup.addLayer(marker);
+        }
+      });
+
+      // Add cluster group to map
+      this.map.addLayer(this.markerClusterGroup);
+    },
+    async loadActivities() {
+      try {
+        const data = await getContentList("activities");
+        this.activities = Array.isArray(data) ? data : [];
+      } catch (err) {
+        console.warn("Unable to load activities for map icons:", err);
+        this.activities = [];
+      }
+    },
+    async loadClubs() {
+      try {
+        const data = await getContentList("clubs");
+        this.clubs = Array.isArray(data) ? data : [];
+
+        const points = this.clubs
+          .map((club) => club?.coordinates)
+          .filter((value) => this.hasCoordinates(value))
+          .map((coordinates) => this.getCoordinates(coordinates));
+
+        if (points.length > 0 && this.map) {
+          this.$nextTick(() => {
+            this.initializeMarkerCluster();
+            this.map.fitBounds(points, { padding: [30, 30] });
+          });
+        }
+      } catch (err) {
+        this.error = err?.message || "Failed to load clubs.";
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+};
 </script>
 
-<style scoped>
-.marker-link {
+<style>
+#map {
   position: absolute;
-  transform: translate(-50%, -50%);
-  text-decoration: none;
+  top: 0;
+  bottom: 0;
+  width: 100%;
 }
 
-.marker-badge {
-  display: inline-block;
-  color: #dc2626;
-  font-size: 1.2rem;
-  line-height: 1;
-  text-shadow: 0 0 3px white;
+.map-status {
+  position: absolute;
+  z-index: 500;
+  left: 12px;
+  top: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
 }
 
-.poi-marker {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #2563eb;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+.map-status.error {
+  color: #b00020;
 }
 </style>

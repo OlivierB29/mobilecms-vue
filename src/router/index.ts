@@ -24,12 +24,11 @@ const routes = [
   { path: '/actualites', name: 'Actualites', component: NewsPreview },
   { path: '/actualites/:id', name: 'ActualitesDetails', component: NewsDetails, props: true },
 
-  { path: '/clubs', name: 'Clubs', component: ClubActivities },
   { path: '/clubactivities', name: 'ClubActivities', component: ClubActivities },
-  { path: '/clubmap', name: 'ClubMap', component: ClubMap },
-  { path: '/clubmap/:activity', name: 'ClubMapActivity', component: ClubMap, props: true },
+  { path: '/carte', name: 'Carte', component: ClubMap },
+  { path: '/clublist', name: 'ClubList', component: ClubActivities, props: true },
   { path: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true },
-  { path: '/clubs/:activity', name: 'ClubsActivity', component: ClubActivities, props: true },
+  { path: '/clublist/:activity', name: 'ClubListActivity', component: ClubActivities, props: true },
 
   { path: '/calendar', name: 'Calendar', component: CalendarPage },
   { path: '/calendrier', name: 'Calendrier', component: CalendarPage },
@@ -41,21 +40,21 @@ const routes = [
   { path: '/calendrier/detail/:id', name: 'CalendrierEvent', component: CalendarEvent, props: true },
 
   { path: '/structure', name: 'Structure', component: ItemsPage, props: { type: 'structure' } },
-  { path: '/structure/:id', name: 'StructureDetails', component: ItemDetails, props: route => ({ type: 'structure', id: route.params.id }) },
+  { path: '/structure/:id', name: 'StructureDetails', component: ItemDetails, props: (route: any) => ({ type: 'structure', id: route.params.id }) },
   { path: '/organisation', name: 'Organisation', component: ItemsPage, props: { type: 'structure' } },
-  { path: '/organisation/:id', name: 'OrganisationDetails', component: ItemDetails, props: route => ({ type: 'structure', id: route.params.id }) },
+  { path: '/organisation/:id', name: 'OrganisationDetails', component: ItemDetails, props: (route: any) => ({ type: 'structure', id: route.params.id }) },
   { path: '/contact', name: 'Contact', component: ItemsPage, props: { type: 'contacts' } },
-  { path: '/contact/:id', name: 'ContactDetails', component: ItemDetails, props: route => ({ type: 'contacts', id: route.params.id }) },
+  { path: '/contact/:id', name: 'ContactDetails', component: ItemDetails, props: (route: any) => ({ type: 'contacts', id: route.params.id }) },
   { path: '/reports', name: 'Reports', component: ItemsPage, props: { type: 'reports' } },
   { path: '/comptesrendus', name: 'ComptesRendus', component: ItemsPage, props: { type: 'reports' } },
-  { path: '/reports/:id', name: 'ReportDetails', component: ItemDetails, props: route => ({ type: 'reports', id: route.params.id }) },
-  { path: '/comptesrendus/:id', name: 'ComptesRendusDetails', component: ItemDetails, props: route => ({ type: 'reports', id: route.params.id }) },
+  { path: '/reports/:id', name: 'ReportDetails', component: ItemDetails, props: (route: any) => ({ type: 'reports', id: route.params.id }) },
+  { path: '/comptesrendus/:id', name: 'ComptesRendusDetails', component: ItemDetails, props: (route: any) => ({ type: 'reports', id: route.params.id }) },
   { path: '/links', name: 'Links', component: ItemsPage, props: { type: 'links' } },
   { path: '/liens', name: 'Liens', component: ItemsPage, props: { type: 'links' } },
-  { path: '/links/:id', name: 'LinkDetails', component: ItemDetails, props: route => ({ type: 'links', id: route.params.id }) },
-  { path: '/liens/:id', name: 'LienDetails', component: ItemDetails, props: route => ({ type: 'links', id: route.params.id }) },
+  { path: '/links/:id', name: 'LinkDetails', component: ItemDetails, props: (route: any) => ({ type: 'links', id: route.params.id }) },
+  { path: '/liens/:id', name: 'LienDetails', component: ItemDetails, props: (route: any) => ({ type: 'links', id: route.params.id }) },
   { path: '/documents', name: 'Documents', component: ItemsPage, props: { type: 'documents' } },
-  { path: '/documents/:id', name: 'DocumentDetails', component: ItemDetails, props: route => ({ type: 'documents', id: route.params.id }) },
+  { path: '/documents/:id', name: 'DocumentDetails', component: ItemDetails, props: (route: any) => ({ type: 'documents', id: route.params.id }) },
 
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
 ]
@@ -65,14 +64,14 @@ const router = createRouter({
   routes
 })
 
-const getPageTitle = (route) => {
+const getPageTitle = (route: any) => {
   const title = typeof route.meta?.title === 'function'
     ? route.meta.title()
     : route.meta?.title || route.name || route.path
   return title ? String(title) : ''
 }
 
-router.afterEach((to) => {
+router.afterEach((to: any) => {
   document.title = getPageTitle(to)
 })
 

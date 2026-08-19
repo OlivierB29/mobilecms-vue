@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const isProd = mode === 'production'
@@ -26,7 +28,7 @@ export default defineConfig(({ mode }) => {
           secure: false
         }
       }
-    : {}
+    : undefined
 
   return {
     plugins: [vue()],
@@ -37,3 +39,11 @@ export default defineConfig(({ mode }) => {
     }
   }
 })
+
+
+// https://vite.dev/config/
+/*
+export default defineConfigBaseTs({
+  plugins: [vue()],
+})
+*/

@@ -20,25 +20,39 @@
   </nav>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import SocialLinks from './SocialLinks.vue'
 import { getMenuData } from '../services/menuService'
 import { getDescriptionHead } from '../services/apiService'
 
-const menuItems = ref([])
-const socialNetworks = ref([])
-const description = ref([])
+type SocialNetwork = {
+  title?: string
+  url?: string
+  icon?: string
+}
 
-function normalizeSocialNetworks(networks) {
+type MenuItem = {
+  id: string
+  routerLink: string
+  title: string
+  icon: string
+  order: number
+}
+
+const menuItems = ref<MenuItem[]>([])
+const socialNetworks = ref<Array<Record<string, string>>>([])
+const description = ref<Record<string, any>>({})
+
+function normalizeSocialNetworks(networks: SocialNetwork[] | null | undefined) {
   return (networks || []).map((network) => ({
-    icon: getIconForNetwork(network.title),
+    icon: network.icon || getIconForNetwork(network.title),
     title: network.title || 'Social link',
     href: network.url || '#'
   }))
 }
 
-function getIconForNetwork(title) {
+function getIconForNetwork(title?: string): string {
   const normalized = (title || '').toLowerCase()
   if (normalized.includes('youtube')) return 'bi-youtube'
   if (normalized.includes('discord')) return 'bi-discord'
