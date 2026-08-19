@@ -29,6 +29,7 @@ import { getDescriptionHead } from '../services/apiService'
 type SocialNetwork = {
   title?: string
   url?: string
+  icon?: string
 }
 
 type MenuItem = {
@@ -45,7 +46,7 @@ const description = ref<Record<string, any>>({})
 
 function normalizeSocialNetworks(networks: SocialNetwork[] | null | undefined) {
   return (networks || []).map((network) => ({
-    icon: getIconForNetwork(network.title),
+    icon: network.icon || getIconForNetwork(network.title),
     title: network.title || 'Social link',
     href: network.url || '#'
   }))

@@ -1,7 +1,7 @@
 <template>
   <div class="home-page container py-4">
     <div class="mb-4 text-center">
-      <img :src="bannerUrl" alt="Banner" class="img-fluid rounded shadow-sm" :title="siteDescription" />
+      <img :src="bannerUrl" :alt="bannerAlt" class="img-fluid rounded shadow-sm" :title="siteDescription" />
     </div>
 
 
@@ -53,13 +53,27 @@ type NewsItem = {
   [key: string]: unknown
 }
 
-const bannerUrl = '/assets/banner-1900.jpg'
-
 const latestNews = ref<NewsItem[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
-const metadata = ref<Record<string, any>>({})
+const metadata = ref<{
+  fulltitle?: string
+  title?: string
+  banner?: {
+    imageurl?: string
+    imagealt?: string
+  }
+}>({})
 const siteDescription = computed(() => metadata.value.fulltitle || 'MobileCMS content portal')
+const bannerUrl = computed(() => {
+  const imageUrl = metadata.value.banner?.imageurl
+  if (!imageUrl) return '/assets/banner-1900.jpg'
+  if (imageUrl.startsWith('http') || imageUrl.startsWith('//') || imageUrl.startsWith('/')) {
+    return imageUrl
+  }
+  return `/${imageUrl}`
+})
+const bannerAlt = computed(() => metadata.value.banner?.imagealt || siteDescription.value)
 
 function getNewsDate(item: NewsItem): string {
   return String(item.date || item.updated || item.created || item.publish_date || '')

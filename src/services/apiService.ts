@@ -20,6 +20,6 @@ export function getContentById(type : string, id : string) {
 }
 
 export function getDescriptionHead() {
-  return fetch(`${contentApi}/description/head`)
+  return fetch(`${contentApi}/description/theme`)
     .then(handleResponse)
 }
