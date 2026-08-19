@@ -67,7 +67,7 @@ const metadata = ref<{
 const siteDescription = computed(() => metadata.value.fulltitle || 'MobileCMS content portal')
 const bannerUrl = computed(() => {
   const imageUrl = metadata.value.banner?.imageurl
-  if (!imageUrl) return '/assets/banner-1900.jpg'
+  if (!imageUrl) return ''
   if (imageUrl.startsWith('http') || imageUrl.startsWith('//') || imageUrl.startsWith('/')) {
     return imageUrl
   }
