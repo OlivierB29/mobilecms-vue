@@ -1,18 +1,19 @@
 <template>
   <div class="container py-4">
-    <h2>Calendar Event</h2>
-    <p class="text-muted">Details for event {{ id }}.</p>
+    <h2>Evénement</h2>
 
     <div v-if="loading" class="alert alert-info">Loading event details...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-else-if="eventData" class="card shadow-sm">
       <div class="card-body">
         <h3 class="card-title">{{ eventData.title || eventData.name || `Event ${id}` }}</h3>
-        <p class="card-text" v-html="eventData.description || eventData.details || eventData.body || 'No details available.'"></p>
+        
         <div class="mt-3">
-          <div v-if="eventData.date"><strong>Date:</strong> {{ eventData.date }}</div>
+          <div v-if="eventData.date"><strong>Dates: </strong><span> {{ eventData.date }}</span><span v-if="eventData.enddate"> - {{ eventData.enddate }}</span></div>
+
           <div v-if="eventData.location"><strong>Location:</strong> {{ eventData.location }}</div>
         </div>
+        <p class="card-text" v-html="eventData.description || eventData.details || eventData.body || 'No details available.'"></p>
       </div>
     </div>
     <div v-else class="alert alert-warning">Event not found.</div>
@@ -31,6 +32,7 @@ type EventRecord = {
   details?: string
   body?: string
   date?: string
+  enddate?: string
   location?: string
   [key: string]: any
 }

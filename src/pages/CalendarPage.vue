@@ -18,7 +18,14 @@
             <strong>{{item.title}}</strong>
             <div class="small text-muted">{{ item.date || item.datetime || 'No date provided' }}</div>
           </div>
-          <span class="badge bg-primary">{{ item.status || item.category || 'calendar' }}</span>
+
+              <router-link
+      v-if="item.id"
+      class="btn btn-sm btn-outline-primary"
+      :to="{ name: 'CalendarEvent', params: { id: item.id } }"
+    >
+      Open
+    </router-link>
         </div>
       </li>
     </ul>
