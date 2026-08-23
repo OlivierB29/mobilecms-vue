@@ -2,9 +2,13 @@
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Clubs</h2>
-      <router-link to="/carte" class="btn btn-outline-secondary btn-sm d-flex gap-2">
-        <i class="bi bi-map"></i> Carte
-      </router-link>
+<router-link
+  to="/carte"
+  class="btn btn-outline-secondary d-flex gap-2 align-items-center fw-semibold fs-5"
+>
+  <i class="bi bi-map fs-2"></i>
+  <span>Carte</span>
+</router-link>
     </div>
     <p class="text-muted">Liste des clubs</p>
 
