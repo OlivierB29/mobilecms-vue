@@ -7,29 +7,6 @@
 
     <section class="mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 mb-0">Actualités</h2>
-        <router-link class="btn btn-outline-primary btn-sm" to="/news">Tout voir</router-link>
-      </div>
-
-      <div v-if="newsLoading" class="alert alert-info">Loading latest news...</div>
-      <div v-else-if="newsError" class="alert alert-danger">{{ newsError }}</div>
-      <div v-else class="row g-4">
-        <div v-for="item in latestNews" :key="item.id" class="col-lg-6">
-          <div class="card h-100 shadow-sm overflow-hidden">
-            <img v-if="item.image" :src="item.image.url" class="card-img-top home-news-image" :alt="item.image.title || item.title || 'News image'" />
-            <div class="card-body">
-              <h5 class="card-title">{{ item.title || item.name || item.id }}</h5>
-              <p v-if="hasValue(getNewsDate(item))" class="card-text small text-muted mb-2">{{ getNewsDate(item) }}</p>
-              <p class="card-text" v-html="getText(item)"></p>
-              <router-link class="btn btn-primary btn-sm" :to="`/news/${item.id}`">Ouvrir</router-link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4 mb-0">Calendrier</h2>
         <router-link class="btn btn-outline-primary btn-sm" to="/calendrier">Tout voir</router-link>
       </div>
@@ -61,6 +38,30 @@
         </div>
       </div>
     </section>
+
+    <section class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Actualités</h2>
+        <router-link class="btn btn-outline-primary btn-sm" to="/news">Tout voir</router-link>
+      </div>
+
+      <div v-if="newsLoading" class="alert alert-info">Loading latest news...</div>
+      <div v-else-if="newsError" class="alert alert-danger">{{ newsError }}</div>
+      <div v-else class="row g-4">
+        <div v-for="item in latestNews" :key="item.id" class="col-lg-6">
+          <div class="card h-100 shadow-sm overflow-hidden">
+            <img v-if="item.image" :src="item.image.url" class="card-img-top home-news-image" :alt="item.image.title || item.title || 'News image'" />
+            <div class="card-body">
+              <h5 class="card-title">{{ item.title || item.name || item.id }}</h5>
+              <p v-if="hasValue(getNewsDate(item))" class="card-text small text-muted mb-2">{{ getNewsDate(item) }}</p>
+              <p class="card-text" v-html="getText(item)"></p>
+              <router-link class="btn btn-primary btn-sm" :to="`/news/${item.id}`">Ouvrir</router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 
