@@ -1,27 +1,45 @@
 <template>
   <div class="container py-4">
-    <h2>Club details</h2>
+    <div class="mb-4">
+      <div class="text-uppercase small text-muted fw-semibold">Club details</div>
+      <h2 class="mb-0">{{ club?.title || club?.name || `Club ${id}` }}</h2>
+    </div>
 
     <div v-if="loading" class="alert alert-info">Loading club details...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-else-if="club" class="card shadow-sm">
       <div class="card-body">
-        <h3 class="card-title">{{ club.title || club.name || `Club ${id}` }}</h3>
-        <p class="card-text" v-html="club.description || club.details || 'No club details available.'"></p>
-        <dl class="row mt-3">
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <span v-if="club.activity" class="badge bg-primary">{{ club.activity }}</span>
+          <span v-if="club.city" class="badge bg-light text-dark border">
+            <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ club.city }}
+          </span>
+        </div>
+
+        <div class="club-description" v-html="club.description || club.details || 'No club details available.'"></div>
+
+        <dl class="row mt-4 mb-0">
           <template v-if="club.city">
-            <dt class="col-sm-3">Ville</dt>
+            <dt class="col-sm-3">City</dt>
             <dd class="col-sm-9">{{ club.city }}</dd>
           </template>
 
           <template v-if="club.activity">
-            <dt class="col-sm-3">Activité</dt>
+            <dt class="col-sm-3">Activity</dt>
             <dd class="col-sm-9">{{ club.activity }}</dd>
           </template>
 
+          <template v-if="club.department">
+            <dt class="col-sm-3">Department</dt>
+            <dd class="col-sm-9">{{ club.department }}</dd>
+          </template>
         </dl>
-        <div class="mt-3 d-flex gap-2">
-          <a v-if="club.coordinates" :href="openStreetMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">Open Street Maps</a>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+          <a v-if="club.url" :href="club.url" target="_blank" rel="noreferrer" class="btn btn-primary btn-sm">
+            <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>{{ websiteLabel }}
+          </a>
+          <a v-if="club.coordinates" :href="openStreetMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">OpenStreetMap</a>
           <a v-if="club.coordinates" :href="googleMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">Google Maps</a>
         </div>
       </div>
@@ -42,6 +60,8 @@ type ClubRecord = {
   details?: string
   city?: string
   activity?: string
+  department?: string
+  url?: string
   coordinates?: string
   [key: string]: any
 }
@@ -53,6 +73,8 @@ const props = defineProps({
 const club = ref<ClubRecord | null>(null)
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
+
+const websiteLabel = computed(() => club.value?.url?.replace(/^https?:\/\//, '').replace(/\/+$/, '') || '')
 
 const openStreetMapsUrl = computed(() => {
   if (!club.value?.coordinates) return '#'
