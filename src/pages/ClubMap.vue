@@ -195,20 +195,21 @@ export default {
 
 <style>
 #map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
   width: 100%;
+  min-height: clamp(28rem, 72vh, 52rem);
 }
 
 .map-status {
-  position: absolute;
-  z-index: 500;
-  left: 12px;
-  top: 12px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  width: fit-content;
+  margin: 1rem 1rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
   background: rgba(255, 255, 255, 0.9);
+}
+
+#map .leaflet-container {
+  height: 100%;
+  min-height: inherit;
 }
 
 .map-status.error {
