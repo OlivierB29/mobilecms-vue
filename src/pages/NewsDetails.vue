@@ -70,7 +70,11 @@ onMounted(() => {
 
   getContentById('news', newsId)
     .then((data: NewsRecord) => {
-      news.value = initItemMedia('news', newsId, data)
+      const article = initItemMedia('news', newsId, data)
+      news.value = article
+      if (article.title) {
+        document.title = article.title
+      }
     })
     .catch((err: Error) => {
       error.value = err.message || 'Failed to load news details.'
