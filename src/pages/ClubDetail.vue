@@ -19,18 +19,20 @@
         <div class="club-description" v-html="club.description || club.details || 'No club details available.'"></div>
 
         <dl class="row mt-4 mb-0">
-          <template v-if="club.city">
-            <dt class="col-sm-3">City</dt>
-            <dd class="col-sm-9">{{ club.city }}</dd>
-          </template>
-
           <template v-if="club.activity">
-            <dt class="col-sm-3">Activity</dt>
+            <dt class="col-sm-3">Activité</dt>
             <dd class="col-sm-9">{{ club.activity }}</dd>
           </template>
 
+          <template v-if="club.city">
+            <dt class="col-sm-3">Ville</dt>
+            <dd class="col-sm-9">{{ club.city }}</dd>
+          </template>
+
+
+
           <template v-if="club.department">
-            <dt class="col-sm-3">Department</dt>
+            <dt class="col-sm-3">Département</dt>
             <dd class="col-sm-9">{{ club.department }}</dd>
           </template>
         </dl>
