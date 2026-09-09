@@ -182,17 +182,14 @@ function normalizeNews(items: ContentItem[] | null | undefined): ContentItem[] {
 function normalizeEvents(items: ContentItem[] | null | undefined): ContentItem[] {
   const now = new Date()
   const pastBound = new Date(now)
-  pastBound.setMonth(pastBound.getMonth() - 2)
-  const futureBound = new Date(now)
-  futureBound.setFullYear(futureBound.getFullYear() + 1)
-
+  pastBound.setDate(pastBound.getDate() - 7)
   const inWindow = (items || []).filter((item) => {
     const timestamp = Date.parse(getEventDate(item))
     if (Number.isNaN(timestamp)) return false
-    return timestamp >= pastBound.getTime() && timestamp <= futureBound.getTime()
+    return timestamp >= pastBound.getTime()
   })
 
-  return sortLatestByDate(inWindow.map((item) => withItemImage('calendar', item)), getEventDate)
+  return sortLatestByDate(inWindow.map((item) => withItemImage('calendar', item)), getEventDate).slice(0, 5)
 }
 
 onMounted(() => {
