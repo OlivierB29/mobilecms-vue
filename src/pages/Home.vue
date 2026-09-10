@@ -124,7 +124,7 @@ function getNewsDate(item: ContentItem): string {
 }
 
 function getEventDate(item: ContentItem): string {
-  return String(item.date || item.datetime || item.enddate || item.updated || item.created || '')
+  return String(item.date || '')
 }
 
 function getEventTimestamp(item: ContentItem): number {
@@ -180,16 +180,19 @@ function normalizeNews(items: ContentItem[] | null | undefined): ContentItem[] {
 }
 
 function normalizeEvents(items: ContentItem[] | null | undefined): ContentItem[] {
-  const now = new Date()
+
+  const sortedItems = sortLatestByDate(items || [], getEventDate).reverse()
+    const now = new Date()
+    
   const pastBound = new Date(now)
-  pastBound.setDate(pastBound.getDate() - 7)
-  const inWindow = (items || []).filter((item) => {
+  pastBound.setDate(pastBound.getDate() - 15)
+  const inWindow = sortedItems.filter((item) => {
     const timestamp = Date.parse(getEventDate(item))
     if (Number.isNaN(timestamp)) return false
     return timestamp >= pastBound.getTime()
   })
 
-  return sortLatestByDate(inWindow.map((item) => withItemImage('calendar', item)), getEventDate).slice(0, 5)
+  return inWindow.map((item) => withItemImage('calendar', item)).slice(0, 5)
 }
 
 onMounted(() => {
