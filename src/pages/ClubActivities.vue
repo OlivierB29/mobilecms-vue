@@ -9,9 +9,9 @@
           <span class="eyebrow">Carte régionale</span>
           <h2 id="map-title">Trouver un club</h2>
         </div>
-        <span class="club-count" aria-live="polite">{{ clubs.length }} club{{ clubs.length > 1 ? 's' : '' }}</span>
+        <span class="club-count" aria-live="polite">{{ activityClubs.length }} club{{ activityClubs.length > 1 ? 's' : '' }}</span>
       </div>
-      <ClubMap :clubs="clubs" :show-club-list="false" />
+      <ClubMap :clubs="activityClubs" :show-club-list="false" />
     </section>
 
     <section aria-labelledby="club-list-title">
@@ -25,7 +25,6 @@
           class="form-control"
           placeholder="Rechercher un club..."
           aria-label="Rechercher des clubs"
-          @keydown.enter="applySearch"
         />
       </div>
       <div class="col-md-4 col-lg-3 d-flex gap-2">
@@ -60,19 +59,29 @@ import ClubMap from './ClubMap.vue'
 import type { ClubItem } from '../model/content'
 import { getDisciplineColor } from '../services/disciplineService'
 
+const props = defineProps<{
+  activity?: string
+}>()
+
 const clubs = ref<ClubItem[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
 const searchTerm = ref('')
 
+const activityClubs = computed(() => {
+  const activity = String(props.activity || '').trim().toLowerCase()
+  if (!activity) return clubs.value
+  return clubs.value.filter((club) => String(club.activity || '').trim().toLowerCase().includes(activity))
+})
+
 const filteredClubs = computed(() => {
   const query = searchTerm.value.trim().toLowerCase()
 
   if (!query) {
-    return clubs.value
+    return activityClubs.value
   }
 
-  return clubs.value.filter((club) => {
+  return activityClubs.value.filter((club) => {
     const searchableValues = [club.title, club.name, club.city, club.activity, club.id, club.url]
 
     return searchableValues.some((value) => {

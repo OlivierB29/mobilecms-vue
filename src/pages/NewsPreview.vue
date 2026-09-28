@@ -10,7 +10,6 @@
           class="form-control"
           placeholder="Rechercher une actualité..."
           aria-label="Rechercher une actualité"
-          @keydown.enter="applySearch"
         />
       </div>
       <div class="col-md-4 col-lg-3 d-flex gap-2">

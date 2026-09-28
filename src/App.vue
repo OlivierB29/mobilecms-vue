@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column min-vh-100">
-    <a href="#main-content" class="visually-hidden-focusable">Aller au contenu</a>
+    <a href="#main-content" class="visually-hidden-focusable" @click.prevent="skipToContent">Aller au contenu</a>
     <Sidenav />
     <main id="main-content" class="flex-grow-1" tabindex="-1">
       <router-view />
@@ -12,4 +12,8 @@
 <script setup lang="ts">
 import Sidenav from './components/Sidenav.vue'
 import AppFooter from './components/AppFooter.vue'
+
+function skipToContent() {
+  document.querySelector<HTMLElement>('#main-content')?.focus()
+}
 </script>

@@ -10,7 +10,6 @@
           class="form-control"
           :placeholder="`Rechercher ${title.toLowerCase()}...`"
           :aria-label="`Rechercher dans ${title}`"
-          @keydown.enter="applySearch"
         />
       </div>
       <div class="col-md-4 col-lg-3 d-flex gap-2">
@@ -120,7 +119,14 @@ function clearSearch() {
 }
 
 function getDetailRoute(id: string | number) {
-  return `/${props.type}/${encodeURIComponent(String(id))}`
+  const routeByType: Record<string, string> = {
+    structure: 'organisation',
+    contacts: 'contact',
+    reports: 'comptesrendus',
+    links: 'links',
+    documents: 'documents'
+  }
+  return `/${routeByType[props.type] || props.type}/${encodeURIComponent(String(id))}`
 }
 
 function getQuickLinks(item: ContentItem) {

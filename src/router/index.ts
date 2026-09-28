@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
-  scrollBehavior: () => ({ top: 0 })
+  scrollBehavior: (_to, _from, savedPosition) => savedPosition || { top: 0 }
 })
 
 router.afterEach(async (to, from) => {
