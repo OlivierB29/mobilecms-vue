@@ -185,7 +185,7 @@ function normalizeEvents(items: ContentItem[] | null | undefined): ContentItem[]
     const now = new Date()
     
   const pastBound = new Date(now)
-  pastBound.setDate(pastBound.getDate() - 15)
+  
   const inWindow = sortedItems.filter((item) => {
     const timestamp = Date.parse(getEventDate(item))
     if (Number.isNaN(timestamp)) return false
