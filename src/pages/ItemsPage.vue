@@ -1,70 +1,54 @@
 <template>
   <div class="container py-4">
-    <h2>{{ title }}</h2>
+    <h1 class="page-title">{{ title }}</h1>
 
-    <div class="row g-2 mb-4 align-items-center">
+    <form v-if="type !== 'structure'" class="row g-2 mb-4 align-items-center" role="search" @submit.prevent="applySearch">
       <div class="col-md-8 col-lg-9">
         <input
           v-model="searchTerm"
           type="search"
           class="form-control"
           :placeholder="`Rechercher ${title.toLowerCase()}...`"
-          aria-label="Search items"
+          :aria-label="`Rechercher dans ${title}`"
           @keydown.enter="applySearch"
         />
       </div>
       <div class="col-md-4 col-lg-3 d-flex gap-2">
-        <button type="button" class="btn btn-primary w-100" @click="applySearch">Rechercher</button>
+        <button type="submit" class="btn btn-primary w-100">Rechercher</button>
         <button
           v-if="searchTerm"
           type="button"
           class="btn btn-outline-secondary"
           @click="clearSearch"
         >
-          Clear
+          Effacer
         </button>
       </div>
-    </div>
+    </form>
 
-    <div v-if="loading" class="alert alert-info">Loading {{ type }}...</div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+    <div v-if="loading" class="alert alert-info" role="status">Chargement…</div>
+    <div v-else-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
 
-    <div v-else-if="items.length" class="row g-4">
-      <div v-for="item in items" :key="item.id || item.url" class="col-md-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="card-title">{{ item.title || item.name || item.id || item.url }}</h5>
-            <div class="card-text" v-html="item.description || item.subtitle || ''"></div>
-            <div v-if="getQuickLinks(item).length" class="mt-3">
-              <div class="small fw-semibold mb-2">Files</div>
-              <div class="d-flex flex-wrap gap-2">
-                <a
-                  v-for="link in getQuickLinks(item)"
-                  :key="link.url + link.title"
-                  :href="link.url"
-                  class="btn btn-outline-secondary btn-sm"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {{ link.title || 'Open' }}
-                </a>
-              </div>
-            </div>
-            <div class="mt-3 d-flex gap-2">
-              <router-link
-                v-if="item.id"
-                :to="getDetailRoute(item.id)"
-                class="btn btn-outline-primary btn-sm"
-              >
-                Ouvrir
-              </router-link>
-            </div>
+    <div v-else-if="items.length" class="item-list">
+      <article v-for="item in items" :key="item.id || item.url" class="item-row">
+        <div class="item-content">
+          <h2 class="item-title">
+            <router-link v-if="item.id" :to="getDetailRoute(item.id)">{{ item.title || item.name || item.id }}</router-link>
+            <span v-else>{{ item.title || item.name || item.url }}</span>
+          </h2>
+          <AccessibleHtml v-if="item.description || item.subtitle" class="item-description" :html="item.description || item.subtitle" />
+          <div v-if="getQuickLinks(item).length" class="item-links" aria-label="Documents associés">
+            <a v-for="link in getQuickLinks(item)" :key="link.url + link.title" :href="link.url" class="document-link" target="_blank" rel="noreferrer">
+              <i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>
+              {{ link.title || 'Télécharger le document' }}
+              <span class="visually-hidden"> (nouvelle fenêtre)</span>
+            </a>
           </div>
         </div>
-      </div>
+      </article>
     </div>
     <div v-else class="alert alert-secondary">
-      {{ searchTerm ? `No items match "${searchTerm}" for ${type}.` : `No items available for ${type}.` }}
+      {{ searchTerm ? `Aucun résultat pour « ${searchTerm} ».` : 'Aucun contenu disponible.' }}
     </div>
   </div>
 </template>
@@ -72,18 +56,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { getContentList } from '../services/apiService'
-
-type CollectionItem = {
-  id?: string | number
-  url?: string
-  title?: string
-  name?: string
-  description?: string
-  subtitle?: string
-  attachments?: Array<{ title?: string; name?: string; url?: string }>
-  media?: Array<{ title?: string; name?: string; url?: string }>
-  [key: string]: any
-}
+import AccessibleHtml from '../components/AccessibleHtml.vue'
+import type { ContentItem } from '../model/content'
 
 const props = defineProps({
   type: {
@@ -103,7 +77,7 @@ const title = computed(() => {
   return labels[props.type] || props.type.charAt(0).toUpperCase() + props.type.slice(1)
 })
 
-const allItems = ref<CollectionItem[]>([])
+const allItems = ref<ContentItem[]>([])
 const searchTerm = ref('')
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
@@ -149,7 +123,7 @@ function getDetailRoute(id: string | number) {
   return `/${props.type}/${encodeURIComponent(String(id))}`
 }
 
-function getQuickLinks(item: CollectionItem) {
+function getQuickLinks(item: ContentItem) {
   const links: Array<{ title: string; url: string }> = []
 
   if (Array.isArray(item.attachments)) {
@@ -178,11 +152,11 @@ function loadItems() {
   allItems.value = []
 
   getContentList(props.type)
-    .then((data: CollectionItem[]) => {
+    .then((data: ContentItem[]) => {
       allItems.value = data || []
     })
     .catch((err: Error) => {
-      error.value = err.message || `Failed to load ${props.type}.`
+      error.value = err.message || 'Impossible de charger les contenus.'
     })
     .finally(() => {
       loading.value = false
@@ -192,3 +166,21 @@ function loadItems() {
 onMounted(loadItems)
 watch(() => props.type, loadItems)
 </script>
+
+<style scoped>
+.page-title { margin-bottom: 1.5rem; font-size: clamp(2rem, 5vw, 3.5rem); }
+.item-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.item-row { min-width: 0; padding: 1.5rem; border: 1px solid #d5d5d1; border-radius: 10px; background: #fff; }
+.item-title { margin: 0 0 .65rem; font-size: clamp(1.2rem, 2vw, 1.65rem); }
+.item-title a { display: inline-flex; min-height: 44px; align-items: center; color: #242424; text-decoration: underline; text-decoration-color: #aaa; text-underline-offset: 5px; }
+.item-title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.item-description { max-width: 800px; color: #555; line-height: 1.6; }
+.item-description :deep(p:last-child) { margin-bottom: 0; }
+.item-links { display: flex; flex-wrap: wrap; gap: .6rem 1.2rem; margin-top: 1rem; }
+.document-link { display: inline-flex; min-height: 44px; align-items: center; gap: .45rem; color: #353535; font-size: .88rem; font-weight: 600; }
+@media (max-width: 767px) {
+  .item-list { grid-template-columns: 1fr; }
+  .item-row { padding: 1.2rem; }
+  .item-description { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+}
+</style>

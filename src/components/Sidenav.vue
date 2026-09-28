@@ -1,15 +1,15 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-      <router-link class="navbar-brand" to="/"> {{ description.title }}</router-link>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+  <nav aria-label="Navigation principale" class="navbar navbar-expand-lg navbar-dark site-nav">
+    <div class="container">
+      <router-link class="navbar-brand" to="/"> {{ description.title || 'CKDR Bretagne' }}</router-link>
+      <button class="navbar-toggler" type="button" @click="menuOpen = !menuOpen" aria-controls="navbarNav" :aria-expanded="menuOpen" :aria-label="menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="collapse navbar-collapse" :class="{ show: menuOpen }" id="navbarNav" @keydown.esc="closeMenu">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li v-for="item in menuItems" :key="item.id" class="nav-item">
             <router-link class="nav-link" :to="item.routerLink">
-              <i :class="['me-1', 'bi', item.icon]"></i>
+              <i aria-hidden="true" :class="['me-1', 'bi', item.icon]"></i>
               {{ item.title }}
             </router-link>
           </li>
@@ -21,16 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import SocialLinks from './SocialLinks.vue'
 import { getMenuData } from '../services/menuService'
 import { getDescriptionHead } from '../services/apiService'
-
-type SocialNetwork = {
-  title?: string
-  url?: string
-  icon?: string
-}
+import type { SiteMetadata, SocialNetwork } from '../model/content'
 
 type MenuItem = {
   id: string
@@ -40,9 +36,13 @@ type MenuItem = {
   order: number
 }
 
+const menuOpen = ref(false)
+const route = useRoute()
+watch(() => route.fullPath, () => { menuOpen.value = false })
+function closeMenu() { menuOpen.value = false; document.querySelector<HTMLButtonElement>('.navbar-toggler')?.focus() }
 const menuItems = ref<MenuItem[]>([])
 const socialNetworks = ref<Array<Record<string, string>>>([])
-const description = ref<Record<string, any>>({})
+const description = ref<SiteMetadata>({})
 
 function normalizeSocialNetworks(networks: SocialNetwork[] | null | undefined) {
   return (networks || []).map((network) => ({
@@ -74,11 +74,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.navbar-brand {
+.site-nav { background: #181818; padding: 1.3rem 0; border-bottom: 1px solid #444; }
+.navbar-brand { font-size: 1rem; font-weight: 800; margin-right: 2rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 .nav-link {
-  white-space: nowrap;
+  white-space: nowrap; font-size: .8rem; padding: .6rem !important;
 }
+.nav-link.router-link-active { color: white; box-shadow: inset 0 -2px white; }
+@media (min-width: 992px) and (max-width: 1199px) { .navbar-brand { margin-right: .5rem; } .nav-link { font-size: .72rem; padding: .4rem !important; } }
 </style>
