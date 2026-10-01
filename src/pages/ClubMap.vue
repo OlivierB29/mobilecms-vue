@@ -104,7 +104,7 @@ function getMarkerIcon(club: ClubItem) {
 
   return L.divIcon({
     className: 'club-activity-marker',
-    html: `<div style="width:32px;height:32px;border-radius:50%;background:${activityColor};display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.9)">${innerHtml}</div>`,
+    html: `<div style="width:32px;height:32px;border-radius:50%;background:${activityColor};display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff,0 3px 8px rgba(0,0,0,.28);border:2px solid #242424">${innerHtml}</div>`,
     iconSize: [42, 42],
     iconAnchor: [21, 21],
     popupAnchor: [0, -20]
@@ -247,7 +247,7 @@ onBeforeUnmount(() => {
   width: 0.75rem;
   height: 0.75rem;
   flex: 0 0 auto;
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 2px solid #242424;
   border-radius: 50%;
 }
 

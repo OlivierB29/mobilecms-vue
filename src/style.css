@@ -13,7 +13,24 @@ body { font-family: 'Avenir Next', Avenir, 'Segoe UI', sans-serif; background: #
 #app { min-height: 100vh; }
 button, input, textarea, select { font: inherit; }
 a { text-underline-offset: 4px; }
-:focus-visible { outline: 3px solid #777; outline-offset: 4px; }
+:focus-visible { outline: 3px solid #242424; outline-offset: 4px; }
+a { --bs-link-color-rgb: 36, 36, 36; --bs-link-hover-color-rgb: 64, 64, 64; }
+.btn-outline-secondary { --bs-btn-color: #595959; --bs-btn-border-color: #595959; --bs-btn-hover-bg: #595959; --bs-btn-hover-border-color: #595959; --bs-btn-active-bg: #595959; --bs-btn-active-border-color: #595959; }
+.btn:focus-visible, .form-control:focus-visible, .form-select:focus-visible {
+  outline: 3px solid #242424;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px #fff;
+}
+.site-nav a:focus-visible, .site-nav .navbar-toggler:focus-visible, .app-footer a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.leaflet-container:focus-visible, .leaflet-container a:focus-visible, .leaflet-container .leaflet-marker-icon:focus-visible {
+  outline: 3px solid #242424;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px #fff;
+}
 .container { max-width: 1240px; }
 h1, h2, h3, h4, h5 { letter-spacing: -.035em; font-weight: 700; }
 .card { --bs-card-bg: #fff; border: 1px solid #dededb; border-radius: 12px; box-shadow: none !important; }

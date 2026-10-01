@@ -14,7 +14,6 @@
       </div>
       <div class="col-md-4 col-lg-3 d-flex gap-2">
         <button type="submit" class="btn btn-primary w-100">Rechercher</button>
-        <button v-if="searchTerm" type="button" class="btn btn-outline-secondary" @click="clearSearch">Effacer</button>
       </div>
     </form>
 
@@ -63,10 +62,6 @@ const filteredNewsItems = computed(() => {
 
 function applySearch() {
   searchTerm.value = searchTerm.value.trim()
-}
-
-function clearSearch() {
-  searchTerm.value = ''
 }
 
 onMounted(() => {

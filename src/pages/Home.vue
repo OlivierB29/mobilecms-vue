@@ -69,7 +69,7 @@ const calendarLoading = ref<boolean>(true)
 const newsError = ref<string | null>(null)
 const calendarError = ref<string | null>(null)
 const metadata = ref<SiteMetadata>({})
-const siteDescription = computed(() => metadata.value.fulltitle || 'CKDR Bretagne')
+const siteDescription = computed(() => metadata.value.fulltitle || 'CRKDR Bretagne')
 const bannerUrl = computed(() => {
   const imageUrl = metadata.value.banner?.imageurl
   if (!imageUrl) return ''

@@ -1,7 +1,7 @@
 <template>
   <nav aria-label="Navigation principale" class="navbar navbar-expand-lg navbar-dark site-nav">
     <div class="container">
-      <router-link class="navbar-brand" to="/"> {{ description.title || 'CKDR Bretagne' }}</router-link>
+      <router-link class="navbar-brand" to="/"> {{ description.title || 'CRKDR Bretagne' }}</router-link>
       <button class="navbar-toggler" type="button" @click="menuOpen = !menuOpen" aria-controls="navbarNav" :aria-expanded="menuOpen" :aria-label="menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'">
         <span class="navbar-toggler-icon"></span>
       </button>

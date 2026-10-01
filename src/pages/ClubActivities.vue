@@ -39,7 +39,7 @@
     <div v-else-if="filteredClubs.length">
       <div class="club-grid">
         <article v-for="club in filteredClubs" :key="club.id" class="club-card">
-          <span v-if="club.activity" class="club-activity" :style="{ color: getDisciplineColor(club.activity) }">{{ club.activity }}</span>
+          <span v-if="club.activity" class="club-activity" :style="{ color: getDisciplineColor(club.activity, 'text') }">{{ club.activity }}</span>
           <h3><router-link :to="`/clubs/${encodeURIComponent(String(club.id ?? ''))}`">{{ club.title || club.name || club.id }}</router-link></h3>
           <p class="club-city"><i class="bi bi-geo-alt" aria-hidden="true"></i>{{ club.city || 'Ville non renseignée' }}</p>
         </article>

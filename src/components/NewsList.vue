@@ -33,7 +33,7 @@ withDefaults(defineProps<{
 <style scoped>
 .news-list { border-top: 1px solid #cececa; }
 .news-card { display: grid; grid-template-columns: minmax(180px, 28%) 1fr; gap: 1.75rem; padding: 1.5rem 0; border-bottom: 1px solid #cececa; }
-.news-visual { display: flex; min-height: 160px; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; background: #dededb; color: #777; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
+.news-visual { display: flex; min-height: 160px; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; background: #dededb; color: #595959; font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
 .news-visual img { width: 100%; height: 100%; min-height: 160px; object-fit: cover; }
 .news-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; justify-content: center; }
 .news-date { display: block; margin-bottom: .55rem; color: #626262; font-size: .78rem; font-weight: 700; letter-spacing: .06em; }
