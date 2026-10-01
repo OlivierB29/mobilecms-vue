@@ -1,4 +1,6 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
+import { nextTick } from 'vue'
+import { formatPageTitle } from '../services/pageTitleService'
 
 import Home from '../pages/Home.vue'
 import NewsPreview from '../pages/NewsPreview.vue'
@@ -16,63 +18,47 @@ import About from '../pages/About.vue'
 
 
 
-const routes = [
-  { path: '/', name: 'Accueil', component: Home },
-  { path: '/news', name: 'News', component: NewsPreview },
-  { path: '/about', name: 'About', component: About },
-  { path: '/news/:id', name: 'NewsDetails', component: NewsDetails, props: true },
-  { path: '/actualites', name: 'Actualites', component: NewsPreview },
-  { path: '/actualites/:id', name: 'ActualitesDetails', component: NewsDetails, props: true },
+const routes: RouteRecordRaw[] = [
+  { path: '/', name: 'Accueil', component: Home, meta: { title: 'Accueil' } },
+  { path: '/about', name: 'About', component: About, meta: { title: 'À propos' } },
+  { path: '/actualites', alias: '/news', name: 'Actualites', component: NewsPreview, meta: { title: 'Actualités' } },
+  { path: '/actualites/:id', alias: '/news/:id', name: 'ActualitesDetails', component: NewsDetails, props: true, meta: { title: 'Actualité' } },
 
-  { path: '/clubactivities', name: 'ClubActivities', component: ClubActivities },
-  { path: '/carte', name: 'Carte', component: ClubMap },
-  { path: '/clublist', name: 'ClubList', component: ClubActivities, props: true },
-  { path: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true },
-  { path: '/clublist/:activity', name: 'ClubListActivity', component: ClubActivities, props: true },
+  { path: '/clubs', alias: ['/clublist', '/clubactivities'], name: 'ClubList', component: ClubActivities, meta: { title: 'Clubs' } },
+  { path: '/carte', name: 'Carte', component: ClubMap, meta: { title: 'Carte des clubs' } },
+  { path: '/clubs/activite/:activity', alias: '/clublist/:activity', name: 'ClubListActivity', component: ClubActivities, props: true, meta: { title: 'Clubs' } },
+  { path: '/clubs/:id', alias: '/club/:id', name: 'ClubDetail', component: ClubDetail, props: true, meta: { title: 'Club' } },
 
-  { path: '/calendar', name: 'Calendar', component: CalendarPage },
-  { path: '/calendrier', name: 'Calendrier', component: CalendarPage },
-  { path: '/calendar', name: 'CalendarPage', component: CalendarPage },
-  { path: '/calendrier', name: 'CalendrierGoogle', component: CalendarPage },
-  { path: '/calendar/:activity', name: 'CalendarActivities', component: CalendarActivities, props: true },
-  { path: '/calendrier/:activity', name: 'CalendrierActivities', component: CalendarActivities, props: true },
-  { path: '/calendar/detail/:id', name: 'CalendarEvent', component: CalendarEvent, props: true },
-  { path: '/calendrier/detail/:id', name: 'CalendrierEvent', component: CalendarEvent, props: true },
+  { path: '/calendrier', alias: '/calendar', name: 'Calendrier', component: CalendarPage, meta: { title: 'Calendrier' } },
+  { path: '/calendrier/detail/:id', alias: '/calendar/detail/:id', name: 'CalendarEvent', component: CalendarEvent, props: true, meta: { title: 'Événement' } },
+  { path: '/calendrier/:activity', alias: '/calendar/:activity', name: 'CalendarActivities', component: CalendarActivities, props: true, meta: { title: 'Événements' } },
 
-  { path: '/structure', name: 'Structure', component: ItemsPage, props: { type: 'structure' } },
-  { path: '/structure/:id', name: 'StructureDetails', component: ItemDetails, props: (route: any) => ({ type: 'structure', id: route.params.id }) },
-  { path: '/organisation', name: 'Organisation', component: ItemsPage, props: { type: 'structure' } },
-  { path: '/organisation/:id', name: 'OrganisationDetails', component: ItemDetails, props: (route: any) => ({ type: 'structure', id: route.params.id }) },
-  { path: '/contact', name: 'Contact', component: ItemsPage, props: { type: 'contacts' } },
-  { path: '/contact/:id', name: 'ContactDetails', component: ItemDetails, props: (route: any) => ({ type: 'contacts', id: route.params.id }) },
-  { path: '/reports', name: 'Reports', component: ItemsPage, props: { type: 'reports' } },
-  { path: '/comptesrendus', name: 'ComptesRendus', component: ItemsPage, props: { type: 'reports' } },
-  { path: '/reports/:id', name: 'ReportDetails', component: ItemDetails, props: (route: any) => ({ type: 'reports', id: route.params.id }) },
-  { path: '/comptesrendus/:id', name: 'ComptesRendusDetails', component: ItemDetails, props: (route: any) => ({ type: 'reports', id: route.params.id }) },
-  { path: '/links', name: 'Links', component: ItemsPage, props: { type: 'links' } },
-  { path: '/liens', name: 'Liens', component: ItemsPage, props: { type: 'links' } },
-  { path: '/links/:id', name: 'LinkDetails', component: ItemDetails, props: (route: any) => ({ type: 'links', id: route.params.id }) },
-  { path: '/liens/:id', name: 'LienDetails', component: ItemDetails, props: (route: any) => ({ type: 'links', id: route.params.id }) },
-  { path: '/documents', name: 'Documents', component: ItemsPage, props: { type: 'documents' } },
-  { path: '/documents/:id', name: 'DocumentDetails', component: ItemDetails, props: (route: any) => ({ type: 'documents', id: route.params.id }) },
+  { path: '/organisation', alias: '/structure', name: 'Organisation', component: ItemsPage, props: { type: 'structure' }, meta: { title: 'Organisation' } },
+  { path: '/organisation/:id', alias: '/structure/:id', name: 'OrganisationDetails', component: ItemDetails, props: (route) => ({ type: 'structure', id: route.params.id }), meta: { title: 'Organisation' } },
+  { path: '/contact', name: 'Contact', component: ItemsPage, props: { type: 'contacts' }, meta: { title: 'Contact' } },
+  { path: '/contact/:id', name: 'ContactDetails', component: ItemDetails, props: (route) => ({ type: 'contacts', id: route.params.id }), meta: { title: 'Contact' } },
+  { path: '/comptesrendus', alias: '/reports', name: 'ComptesRendus', component: ItemsPage, props: { type: 'reports' }, meta: { title: 'Comptes-rendus' } },
+  { path: '/comptesrendus/:id', alias: '/reports/:id', name: 'ComptesRendusDetails', component: ItemDetails, props: (route) => ({ type: 'reports', id: route.params.id }), meta: { title: 'Compte-rendu' } },
+  { path: '/links', alias: '/liens', name: 'Liens', component: ItemsPage, props: { type: 'links' }, meta: { title: 'Liens' } },
+  { path: '/links/:id', alias: '/liens/:id', name: 'LienDetails', component: ItemDetails, props: (route) => ({ type: 'links', id: route.params.id }), meta: { title: 'Lien' } },
+  { path: '/documents', name: 'Documents', component: ItemsPage, props: { type: 'documents' }, meta: { title: 'Documents' } },
+  { path: '/documents/:id', name: 'DocumentDetails', component: ItemDetails, props: (route) => ({ type: 'documents', id: route.params.id }), meta: { title: 'Document' } },
 
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound, meta: { title: 'Page introuvable' } }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
+  scrollBehavior: (_to, _from, savedPosition) => savedPosition || { top: 0 }
 })
 
-const getPageTitle = (route: any) => {
-  const title = typeof route.meta?.title === 'function'
-    ? route.meta.title()
-    : route.meta?.title || route.name || route.path
-  return title ? String(title) : ''
-}
-
-router.afterEach((to: any) => {
-  document.title = getPageTitle(to)
+router.afterEach(async (to, from) => {
+  document.title = formatPageTitle(String(to.meta.title || ''))
+  if (from.name) {
+    await nextTick()
+    document.querySelector<HTMLElement>('#main-content')?.focus({ preventScroll: true })
+  }
 })
 
 export default router

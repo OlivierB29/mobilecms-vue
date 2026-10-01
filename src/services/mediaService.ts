@@ -1,4 +1,4 @@
-import type { Item } from "../model/item"
+import type { ContentItem, MediaEntry } from '../model/content'
 
 const mediaBaseUrl = import.meta.env.VITE_MEDIA_BASE_URL || '/media'
 
@@ -11,7 +11,7 @@ function ensureAbsoluteUrl(value : string | null | undefined) {
   return url
 }
 
-function resolveMediaUrl(type : string, id : string, entry : any) {
+function resolveMediaUrl(type: string, id: string, entry: MediaEntry): string {
   const url = entry.url || entry.path || ''
   const normalized = url.toString()
   if (normalized.startsWith('http') || normalized.startsWith('//')) {
@@ -20,7 +20,7 @@ function resolveMediaUrl(type : string, id : string, entry : any) {
   return `${mediaBaseUrl}/${type}/${id}/${normalized}`
 }
 
-export function initMediaUrl(type : string, id : string, media : any[]) {
+export function initMediaUrl(type: string, id: string, media: MediaEntry[]): MediaEntry[] {
   if (!media) {
     return []
   }
@@ -33,24 +33,20 @@ export function initMediaUrl(type : string, id : string, media : any[]) {
   })
 }
 
-export function initItemMedia(type : string, id : string, item : any) {
-  if (!item) {
-    return item
-  }
-
+export function initItemMedia<T extends ContentItem>(type: string, id: string, item: T): T {
   return {
     ...item,
     media: Array.isArray(item.media) ? initMediaUrl(type, id, item.media) : item.media,
     images: Array.isArray(item.images) ? initMediaUrl(type, id, item.images) : item.images,
     attachments: Array.isArray(item.attachments) ? initMediaUrl(type, id, item.attachments) : item.attachments
-  }
+  } as T
 }
 
-export function isImage(entry : any) {
+export function isImage(entry: MediaEntry): boolean {
   return !!entry && typeof entry.mimetype === 'string' && entry.mimetype.includes('image')
 }
 
-export function isVideo(entry : any) {
+export function isVideo(entry: MediaEntry): boolean {
   if (!entry || !entry.url) {
     return false
   }
@@ -63,8 +59,8 @@ export function isVideo(entry : any) {
   )
 }
 
-export function getImages(item : Item) {
-  const result = []
+export function getImages(item: ContentItem): MediaEntry[] {
+  const result: MediaEntry[] = []
 
   if (item && Array.isArray(item.images)) {
     result.push(...item.images.filter(isImage).map((img) => ({ ...img, url: ensureAbsoluteUrl(img.url || img.path || '') })))
@@ -77,8 +73,8 @@ export function getImages(item : Item) {
   return result
 }
 
-export function getAttachments(item : Item) {
-  const result = []
+export function getAttachments(item: ContentItem): MediaEntry[] {
+  const result: MediaEntry[] = []
 
   if (item && Array.isArray(item.attachments)) {
     result.push(...item.attachments)

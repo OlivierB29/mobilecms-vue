@@ -1,18 +1,18 @@
 <template>
   <div class="home-page container py-4">
-    <div class="mb-4 text-center">
-      <img :src="bannerUrl" :alt="bannerAlt" class="img-fluid rounded shadow-sm" :title="siteDescription" />
+    <h1 class="visually-hidden">Accueil — CRKDR Bretagne</h1>
+    <div v-if="bannerUrl" class="home-banner mb-4 text-center">
+      <img :src="bannerUrl" :alt="bannerAlt" :title="siteDescription" class="img-fluid rounded" />
     </div>
-
-
-    <section class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 mb-0">Calendrier</h2>
-        <router-link class="btn btn-outline-primary btn-sm" to="/calendrier">Tout voir</router-link>
+    <section class="home-section">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+        <h2 class="section-title mb-0">Calendrier</h2>
+        <router-link class="btn btn-outline-primary btn-sm" to="/calendrier">Tout le calendrier</router-link>
       </div>
 
-      <div v-if="calendarLoading" class="alert alert-info">Loading latest calendar events...</div>
-      <div v-else-if="calendarError" class="alert alert-danger">{{ calendarError }}</div>
+      <div v-if="calendarLoading" class="alert alert-info" role="status">Chargement des rendez-vous…</div>
+      <div v-else-if="calendarError" class="alert alert-danger" role="alert">{{ calendarError }}</div>
+      <p v-else-if="!latestEvents.length" class="empty-state">Aucun rendez-vous à afficher pour le moment.</p>
       <div v-else class="d-flex flex-column gap-3">
         <div v-for="item in latestEvents" :key="item.id" class="home-event-card card shadow-sm">
           <div class="d-flex align-items-stretch">
@@ -22,73 +22,45 @@
             </div>
             <div class="card-body d-flex flex-column flex-md-row align-items-md-center gap-3">
               <div class="flex-grow-1">
-                <h5 class="card-title mb-1">{{ item.title || item.name || item.id }}</h5>
+                <h3 class="h5 card-title mb-1">{{ item.title || item.name || item.id }}</h3>
                 <p v-if="hasValue(item.date) || hasValue(item.datetime) || hasValue(item.enddate)" class="card-text small text-muted mb-1">
                   <i class="bi bi-calendar-event me-1"></i>
-                  {{ item.date || item.datetime }}<span v-if="hasValue(item.enddate)"> - {{ item.enddate }}</span>
+                  {{ formatDate(item.date || item.datetime) }}<span v-if="hasValue(item.enddate) && formatDate(item.enddate) !== formatDate(item.date || item.datetime)"> - {{ formatDate(item.enddate) }}</span>
                 </p>
                 <p v-if="item.location" class="card-text small text-muted mb-1">
                   <i class="bi bi-geo-alt me-1"></i>{{ item.location }}
                 </p>
-                <p class="card-text mb-0" v-html="getText(item)"></p>
+                <p class="card-text mb-0">{{ getText(item) }}</p>
               </div>
-              <router-link class="btn btn-outline-primary btn-sm align-self-md-center flex-shrink-0" :to="`/calendrier/detail/${item.id}`">Ouvrir</router-link>
+              <router-link class="btn btn-outline-primary btn-sm align-self-md-center flex-shrink-0" :to="`/calendrier/detail/${item.id}`" :aria-label="`Consulter : ${item.title || item.name || item.id}`">Consulter <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></router-link>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 mb-0">Actualités</h2>
-        <router-link class="btn btn-outline-primary btn-sm" to="/news">Tout voir</router-link>
+    <section class="home-section">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+        <h2 class="section-title mb-0">Actualités</h2>
+        <router-link class="btn btn-outline-primary btn-sm" to="/actualites">Toutes les actualités</router-link>
       </div>
 
-      <div v-if="newsLoading" class="alert alert-info">Loading latest news...</div>
-      <div v-else-if="newsError" class="alert alert-danger">{{ newsError }}</div>
-      <div v-else class="row g-4">
-        <div v-for="item in latestNews" :key="item.id" class="col-lg-6">
-          <div class="card h-100 shadow-sm overflow-hidden">
-            <img v-if="item.image" :src="item.image.url" class="card-img-top home-news-image" :alt="item.image.title || item.title || 'News image'" />
-            <div class="card-body">
-              <h5 class="card-title">{{ item.title || item.name || item.id }}</h5>
-              <p v-if="hasValue(getNewsDate(item))" class="card-text small text-muted mb-2">{{ getNewsDate(item) }}</p>
-              <p class="card-text" v-html="getText(item)"></p>
-              <router-link class="btn btn-primary btn-sm" :to="`/news/${item.id}`">Ouvrir</router-link>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div v-if="newsLoading" class="alert alert-info" role="status">Chargement des actualités…</div>
+      <div v-else-if="newsError" class="alert alert-danger" role="alert">{{ newsError }}</div>
+      <p v-else-if="!latestNews.length" class="empty-state">Aucune actualité à afficher pour le moment.</p>
+      <NewsList v-else :items="latestNews" :heading-level="3" />
     </section>
 
   </div>
 </template>
 
 <script setup lang="ts">
+import { formatDate, getItemTimestamp, splitEventsByDate } from '../services/dateService'
 import { computed, onMounted, ref } from 'vue'
 import { getContentList, getDescriptionHead } from '../services/apiService'
-import { getImages, initItemMedia } from '../services/mediaService'
-
-type ContentItem = {
-  id?: string | number
-  slug?: string
-  name?: string
-  title?: string
-  description?: string
-  details?: string
-  body?: string
-  summary?: string
-  date?: string
-  datetime?: string
-  enddate?: string
-  location?: string
-  updated?: string
-  created?: string
-  publish_date?: string
-  image?: { url?: string; title?: string } | null
-  [key: string]: unknown
-}
+import { getContentText, normalizeNewsItems } from '../services/newsService'
+import type { ContentItem, SiteMetadata } from '../model/content'
+import NewsList from '../components/NewsList.vue'
 
 const latestNews = ref<ContentItem[]>([])
 const latestEvents = ref<ContentItem[]>([])
@@ -96,15 +68,8 @@ const newsLoading = ref<boolean>(true)
 const calendarLoading = ref<boolean>(true)
 const newsError = ref<string | null>(null)
 const calendarError = ref<string | null>(null)
-const metadata = ref<{
-  fulltitle?: string
-  title?: string
-  banner?: {
-    imageurl?: string
-    imagealt?: string
-  }
-}>({})
-const siteDescription = computed(() => metadata.value.fulltitle || 'MobileCMS content portal')
+const metadata = ref<SiteMetadata>({})
+const siteDescription = computed(() => metadata.value.fulltitle || 'CRKDR Bretagne')
 const bannerUrl = computed(() => {
   const imageUrl = metadata.value.banner?.imageurl
   if (!imageUrl) return ''
@@ -119,16 +84,8 @@ function hasValue(value: unknown): boolean {
   return String(value ?? '').trim() !== ''
 }
 
-function getNewsDate(item: ContentItem): string {
-  return String(item.date || item.updated || item.created || item.publish_date || '')
-}
-
-function getEventDate(item: ContentItem): string {
-  return String(item.date || '')
-}
-
 function getEventTimestamp(item: ContentItem): number {
-  return Date.parse(getEventDate(item))
+  return getItemTimestamp(item)
 }
 
 function formatEventDay(item: ContentItem): string {
@@ -143,56 +100,18 @@ function formatEventMonth(item: ContentItem): string {
   return new Date(timestamp).toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')
 }
 
-function sortLatestByDate(items: ContentItem[], getDate: (item: ContentItem) => string): ContentItem[] {
-  return [...items].sort((a, b) => {
-    const aDate = Date.parse(getDate(a))
-    const bDate = Date.parse(getDate(b))
-
-    if (!Number.isNaN(aDate) && !Number.isNaN(bDate)) {
-      return bDate - aDate
-    }
-
-    if (!Number.isNaN(aDate)) return -1
-    if (!Number.isNaN(bDate)) return 1
-
-    return String(b.id || '').localeCompare(String(a.id || ''))
-  }).slice(0, 6)
-}
-
 function getText(item: ContentItem): string {
-  const text = String(item.description || item.details || item.body || item.summary || '')
-  const plainText = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-  return plainText
-}
-
-function withItemImage(type: string, item: ContentItem): ContentItem {
-  const itemId = String(item.id || item.slug || item.name || '')
-  const initialized = initItemMedia(type, itemId, item) as ContentItem
-  const images = getImages(initialized as any)
-  return {
-    ...initialized,
-    image: images[0] || null
-  }
+  return getContentText(item)
 }
 
 function normalizeNews(items: ContentItem[] | null | undefined): ContentItem[] {
-  return sortLatestByDate((items || []).map((item) => withItemImage('news', item)), getNewsDate)
+  return normalizeNewsItems(items, 6)
 }
 
 function normalizeEvents(items: ContentItem[] | null | undefined): ContentItem[] {
+  const { upcoming } = splitEventsByDate(items || [])
 
-  const sortedItems = sortLatestByDate(items || [], getEventDate).reverse()
-    const now = new Date()
-    
-  const pastBound = new Date(now)
-  
-  const inWindow = sortedItems.filter((item) => {
-    const timestamp = Date.parse(getEventDate(item))
-    if (Number.isNaN(timestamp)) return false
-    return timestamp >= pastBound.getTime()
-  })
-
-  return inWindow.map((item) => withItemImage('calendar', item)).slice(0, 5)
+  return upcoming.slice(0, 5)
 }
 
 onMounted(() => {
@@ -209,7 +128,7 @@ onMounted(() => {
       latestNews.value = normalizeNews(data)
     })
     .catch((err) => {
-      newsError.value = err.message || 'Failed to load news.'
+      newsError.value = err.message || 'Impossible de charger les actualités.'
     })
     .finally(() => {
       newsLoading.value = false
@@ -220,7 +139,7 @@ onMounted(() => {
       latestEvents.value = normalizeEvents(data)
     })
     .catch((err) => {
-      calendarError.value = err.message || 'Failed to load calendar events.'
+      calendarError.value = err.message || 'Impossible de charger les événements.'
     })
     .finally(() => {
       calendarLoading.value = false
@@ -229,45 +148,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.home-page img {
-  max-height: 320px;
-  object-fit: cover;
-  width: 100%;
-}
-
-.home-news-image {
-  height: 220px;
-  object-fit: cover;
-}
-
-.home-event-card {
-  overflow: hidden;
-  border: 0;
-  border-left: 4px solid #4f46e5;
-}
-
-.home-event-date {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 5.5rem;
-  padding: 0.75rem 0.5rem;
-  background: #eef2ff;
-  color: #3730a3;
-  text-align: center;
-}
-
-.home-event-day {
-  font-size: 1.75rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.home-event-month {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-top: 0.25rem;
+.home-banner img { display: block; width: 100%; height: auto; margin-inline: auto; }
+.home-section { margin-bottom: 3.5rem; }
+.section-title { font-size: clamp(1.6rem, 3vw, 2rem); }
+.home-event-card { overflow: hidden; }
+.home-event-date { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 5.5rem; padding: .75rem .5rem; background: #e9e9e6; color: #242424; text-align: center; }
+.home-event-day { font-size: 2rem; font-weight: 700; line-height: 1; }
+.home-event-month { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; margin-top: .4rem; }
+.card-text { overflow-wrap: anywhere; }
+.empty-state { padding: 2rem; border: 1px dashed #aaa; border-radius: 8px; color: #606060; }
+@media (max-width: 767px) {
+  .home-event-date { min-width: 4rem; }
+  .card-body { padding: 1rem; min-width: 0; }
+  .section-title { font-size: 1.5rem; }
 }
 </style>

@@ -1,12 +1,13 @@
 <template>
   <div class="container py-4">
+    <BackLink to="/clubs" label="Retour aux clubs" />
     <div class="mb-4">
-      <div class="text-uppercase small text-muted fw-semibold">Club details</div>
-      <h2 class="mb-0">{{ club?.title || club?.name || `Club ${id}` }}</h2>
+      <div class="text-uppercase small text-muted fw-semibold">Club</div>
+      <h1 class="mb-0">{{ club?.title || club?.name || `Club ${id}` }}</h1>
     </div>
 
-    <div v-if="loading" class="alert alert-info">Loading club details...</div>
-    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+    <div v-if="loading" class="alert alert-info" role="status">Chargement du club…</div>
+    <div v-else-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
     <div v-else-if="club" class="card shadow-sm">
       <div class="card-body">
         <div class="d-flex flex-wrap gap-2 mb-4">
@@ -16,7 +17,7 @@
           </span>
         </div>
 
-        <div class="club-description" v-html="club.description || club.details || 'No club details available.'"></div>
+        <AccessibleHtml class="club-description" :html="club.description || club.details || 'Aucune information disponible.'" />
 
         <dl class="row mt-4 mb-0">
           <template v-if="club.activity">
@@ -38,45 +39,43 @@
         </dl>
 
         <div class="mt-4 d-flex flex-wrap gap-2">
-          <a v-if="club.url" :href="club.url" target="_blank" rel="noreferrer" class="btn btn-primary btn-sm">
-            <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>{{ websiteLabel }}
+          <a v-if="websiteUrl" :href="websiteUrl" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+            <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>{{ websiteLabel }}<span class="visually-hidden"> (nouvelle fenêtre)</span>
           </a>
-          <a v-if="club.coordinates" :href="openStreetMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">OpenStreetMap</a>
-          <a v-if="club.coordinates" :href="googleMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">Google Maps</a>
+          <a v-if="club.coordinates" :href="openStreetMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">OpenStreetMap<span class="visually-hidden"> (nouvelle fenêtre)</span></a>
+          <a v-if="club.coordinates" :href="googleMapsUrl" target="_blank" rel="noreferrer" class="btn btn-outline-primary btn-sm">Google Maps<span class="visually-hidden"> (nouvelle fenêtre)</span></a>
         </div>
       </div>
     </div>
-    <div v-else class="alert alert-warning">Club not found.</div>
+    <div v-else class="alert alert-warning">Club introuvable.</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getContentById } from '../services/apiService'
-
-type ClubRecord = {
-  id?: string | number
-  title?: string
-  name?: string
-  description?: string
-  details?: string
-  city?: string
-  activity?: string
-  department?: string
-  url?: string
-  coordinates?: string
-  [key: string]: any
-}
+import BackLink from '../components/BackLink.vue'
+import AccessibleHtml from '../components/AccessibleHtml.vue'
+import { setPageTitle } from '../services/pageTitleService'
+import type { ClubItem } from '../model/content'
 
 const props = defineProps({
   id: String
 })
 
-const club = ref<ClubRecord | null>(null)
+const club = ref<ClubItem | null>(null)
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
 
-const websiteLabel = computed(() => club.value?.url?.replace(/^https?:\/\//, '').replace(/\/+$/, '') || '')
+const websiteUrl = computed(() => {
+  const url = club.value?.url?.trim()
+  if (!url) return ''
+  if (/^https?:\/\//i.test(url)) return url
+  if (url.startsWith('//')) return `https:${url}`
+  return `https://${url}`
+})
+
+const websiteLabel = computed(() => websiteUrl.value.replace(/^https?:\/\//i, '').replace(/\/+$/, ''))
 
 const openStreetMapsUrl = computed(() => {
   if (!club.value?.coordinates) return '#'
@@ -94,17 +93,18 @@ const googleMapsUrl = computed(() => {
 
 onMounted(() => {
   if (!props.id) {
-    error.value = 'Missing club ID.'
+    error.value = 'Identifiant du club manquant.'
     loading.value = false
     return
   }
 
   getContentById('clubs', props.id)
-    .then((data: ClubRecord) => {
+    .then((data: ClubItem) => {
       club.value = data
+      setPageTitle(data.title || data.name || 'Club')
     })
     .catch((err: Error) => {
-      error.value = err.message || 'Failed to load club details.'
+      error.value = err.message || 'Impossible de charger ce club.'
     })
     .finally(() => {
       loading.value = false
