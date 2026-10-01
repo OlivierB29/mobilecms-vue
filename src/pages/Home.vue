@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { filterEventsInWindow, formatDate, getItemTimestamp, splitEventsByDate } from '../services/dateService'
+import { formatDate, getItemTimestamp, splitEventsByDate } from '../services/dateService'
 import { computed, onMounted, ref } from 'vue'
 import { getContentList, getDescriptionHead } from '../services/apiService'
 import { getContentText, normalizeNewsItems } from '../services/newsService'
@@ -109,10 +109,9 @@ function normalizeNews(items: ContentItem[] | null | undefined): ContentItem[] {
 }
 
 function normalizeEvents(items: ContentItem[] | null | undefined): ContentItem[] {
-  const inWindow = filterEventsInWindow(items || [])
-  const { upcoming, past: recentPast } = splitEventsByDate(inWindow)
+  const { upcoming } = splitEventsByDate(items || [])
 
-  return [...upcoming, ...recentPast].slice(0, 6)
+  return upcoming.slice(0, 5)
 }
 
 onMounted(() => {
