@@ -1,6 +1,7 @@
 <template>
   <div class="container py-4">
     <h1 class="page-title">{{ title }}</h1>
+    <p v-if="type === 'documents'" class="documents-intro">Les documents sont classés par rubrique. Choisissez une rubrique pour retrouver tous ses fichiers et ressources.</p>
 
     <form v-if="type !== 'structure'" class="row g-2 mb-4 align-items-center" role="search" @submit.prevent="applySearch">
       <div class="col-md-8 col-lg-9">
@@ -36,7 +37,11 @@
             <span v-else>{{ item.title || item.name || item.url }}</span>
           </h2>
           <AccessibleHtml v-if="item.description || item.subtitle" class="item-description" :html="item.description || item.subtitle" />
-          <div v-if="getQuickLinks(item).length" class="item-links" aria-label="Documents associés">
+          <router-link v-if="type === 'documents' && item.id" class="btn btn-outline-primary documents-action" :to="getDetailRoute(item.id)">
+            Consulter tous les documents<span class="visually-hidden"> — {{ item.title || item.name || 'de cette rubrique' }}</span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </router-link>
+          <div v-else-if="type !== 'documents' && getQuickLinks(item).length" class="item-links" aria-label="Documents associés">
             <a v-for="link in getQuickLinks(item)" :key="link.url + link.title" :href="link.url" class="document-link" target="_blank" rel="noreferrer">
               <i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>
               {{ link.title || 'Télécharger le document' }}
@@ -175,6 +180,8 @@ watch(() => props.type, loadItems)
 
 <style scoped>
 .page-title { margin-bottom: 1.5rem; font-size: clamp(2rem, 5vw, 3.5rem); }
+.documents-intro { max-width: 48rem; margin: -0.5rem 0 1.75rem; color: #555; line-height: 1.65; }
+.documents-action { display: inline-flex; align-items: center; gap: .75rem; margin-top: 1rem; text-align: left; }
 .item-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .item-row { min-width: 0; padding: 1.5rem; border: 1px solid #d5d5d1; border-radius: 10px; background: #fff; }
 .item-title { margin: 0 0 .65rem; font-size: clamp(1.2rem, 2vw, 1.65rem); }

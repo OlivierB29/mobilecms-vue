@@ -7,7 +7,7 @@
     <div v-else-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
     <div v-else-if="item" class="card shadow-sm">
       <div class="card-body">
-        <AccessibleHtml class="card-text" :html="item.description || item.details || item.body || 'Aucun détail disponible.'" />
+        <AccessibleHtml v-if="item.description || item.details || item.body" class="card-text" :html="item.description || item.details || item.body" />
 
         <dl class="row mt-3">
           <template v-if="item.date">
