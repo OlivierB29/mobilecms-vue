@@ -28,7 +28,14 @@ export function initMediaUrl(type: string, id: string, media: MediaEntry[]): Med
   return media.map((entry) => {
     return {
       ...entry,
-      url: resolveMediaUrl(type, id, entry)
+      url: resolveMediaUrl(type, id, entry),
+      thumbnails: entry.thumbnails?.map((thumbnail) => ({
+        ...thumbnail,
+        url: resolveMediaUrl(type, id, {
+          ...thumbnail,
+          url: thumbnail.url ? `thumbnails/${thumbnail.url}` : ''
+        })
+      }))
     }
   })
 }
