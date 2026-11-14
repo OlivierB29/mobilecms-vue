@@ -64,6 +64,7 @@ export type SiteMetadata = {
   banner?: {
     imageurl?: string
     imagealt?: string
+    thumbnails?: MediaThumbnail[]
   }
   socialnetworks?: SocialNetwork[]
   googlecalendar?: {
