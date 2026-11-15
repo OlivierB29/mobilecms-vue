@@ -2,7 +2,7 @@
   <div class="news-list">
     <article v-for="item in items" :key="item.id" class="news-card">
       <div class="news-visual">
-        <img v-if="item.image?.url" :src="item.image.url" :alt="item.image.title || ''" />
+        <img v-if="item.image?.url" :src="item.image.url" :srcset="getImageSrcset(item.image)" :alt="item.image.title || ''" />
         <span v-else aria-hidden="true">CRKDR</span>
       </div>
       <div class="news-content">
@@ -18,9 +18,19 @@
 </template>
 
 <script setup lang="ts">
-import type { ContentItem } from '../model/content'
+import type { ContentItem, MediaEntry } from '../model/content'
 import { formatDate } from '../services/dateService'
 import { getContentText, getNewsDate } from '../services/newsService'
+
+function getImageSrcset(image: MediaEntry): string | undefined {
+  const thumbnails = image.thumbnails?.filter(({ url, width }) => (
+    Boolean(url) && Number.isFinite(Number(width)) && Number(width) > 0
+  ))
+
+  return thumbnails?.length
+    ? thumbnails.map(({ url, width }) => `${url} ${width}w`).join(', ')
+    : undefined
+}
 
 withDefaults(defineProps<{
   items: ContentItem[]

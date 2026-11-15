@@ -2,7 +2,7 @@
   <div class="home-page container py-4">
     <h1 class="visually-hidden">Accueil — CRKDR Bretagne</h1>
     <div v-if="bannerUrl" class="home-banner mb-4 text-center">
-      <img :src="bannerUrl" :alt="bannerAlt" :title="siteDescription" class="img-fluid rounded" />
+      <img :src="bannerUrl" :srcset="bannerSrcset || undefined" sizes="100vw" :alt="bannerAlt" :title="siteDescription" class="img-fluid rounded" />
     </div>
     <section class="home-section">
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
@@ -77,6 +77,23 @@ const bannerUrl = computed(() => {
     return imageUrl
   }
   return `/${imageUrl}`
+})
+const bannerSrcset = computed(() => {
+  const banner = metadata.value.banner
+  const imageUrl = banner?.imageurl
+  if (!imageUrl) return ''
+
+  const directory = imageUrl.slice(0, imageUrl.lastIndexOf('/') + 1)
+  return (banner.thumbnails || [])
+    .filter((thumbnail) => thumbnail.url && Number(thumbnail.width) > 0)
+    .map((thumbnail) => {
+      const url = `${directory}thumbnails/${thumbnail.url}`
+      const resolvedUrl = url.startsWith('http') || url.startsWith('//') || url.startsWith('/')
+        ? url
+        : `/${url}`
+      return `${resolvedUrl} ${thumbnail.width}w`
+    })
+    .join(', ')
 })
 const bannerAlt = computed(() => metadata.value.banner?.imagealt || siteDescription.value)
 

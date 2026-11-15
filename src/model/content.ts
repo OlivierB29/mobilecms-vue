@@ -4,6 +4,12 @@ export type MediaEntry = {
   title?: string
   name?: string
   mimetype?: string
+  thumbnails?: MediaThumbnail[]
+}
+
+export type MediaThumbnail = {
+  url?: string
+  width?: string | number
 }
 
 export type ContentItem = {
@@ -58,6 +64,7 @@ export type SiteMetadata = {
   banner?: {
     imageurl?: string
     imagealt?: string
+    thumbnails?: MediaThumbnail[]
   }
   socialnetworks?: SocialNetwork[]
   googlecalendar?: {
