@@ -16,14 +16,25 @@
         <AccessibleHtml class="card-text" :html="eventData.description || eventData.details || eventData.body || 'Aucun détail disponible.'" />
       </div>
     </div>
-    <div v-else class="alert alert-warning">Événement introuvable.</div>
+    <div v-if="images.length" class="mt-4">
+      <h2>Images</h2>
+      <div class="row g-3">
+        <div v-for="image in images" :key="image.url" class="col-12 col-md-4">
+          <div class="card">
+            <img :src="image.url" class="card-img-top" :alt="image.title || image.name || ''" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="!loading && !error && !eventData" class="alert alert-warning">Événement introuvable.</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { formatDate } from '../services/dateService'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getContentById } from '../services/apiService'
+import { initItemMedia, getImages } from '../services/mediaService'
 import BackLink from '../components/BackLink.vue'
 import AccessibleHtml from '../components/AccessibleHtml.vue'
 import { setPageTitle } from '../services/pageTitleService'
@@ -36,6 +47,7 @@ const props = defineProps({
 const eventData = ref<ContentItem | null>(null)
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
+const images = computed(() => getImages(eventData.value ?? {}))
 
 onMounted(() => {
   if (!props.id) {
@@ -44,9 +56,12 @@ onMounted(() => {
     return
   }
 
-  getContentById('calendar', props.id)
+  const eventId = String(props.id)
+
+  getContentById('calendar', eventId)
     .then((data: ContentItem) => {
-      eventData.value = data
+      const event = initItemMedia('calendar', eventId, data)
+      eventData.value = event
       setPageTitle(data.title || data.name || 'Événement')
     })
     .catch((err: Error) => {
