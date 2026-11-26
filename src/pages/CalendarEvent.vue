@@ -17,11 +17,19 @@
       </div>
     </div>
     <div v-if="images.length" class="mt-4">
-      <h2>Images</h2>
+
       <div class="row g-3">
         <div v-for="image in images" :key="image.url" class="col-12 col-md-4">
           <div class="card">
-            <img :src="image.url" class="card-img-top" :alt="image.title || image.name || ''" />
+            <a
+              :href="image.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="`Afficher ${image.title || image.name || 'l’image'} en taille réelle (nouvelle fenêtre)`"
+              :title="`Afficher ${image.title || image.name || 'l’image'} en taille réelle (nouvelle fenêtre)`"
+            >
+              <img :src="image.url" class="card-img-top" :alt="image.title || image.name || ''" />
+            </a>
           </div>
         </div>
       </div>
